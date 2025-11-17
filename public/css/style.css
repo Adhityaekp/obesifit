@@ -1,0 +1,45 @@
+.auth-bg {
+    background: linear-gradient(135deg, #4eac92 0%, #3a8c74 50%, #2c6b58 100%);
+}
+
+.card-hover {
+    transition: all 0.3s ease;
+}
+
+.card-hover:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+        0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.tab-active {
+    background-color: #4eac92;
+    color: white;
+}
+
+/* Custom styles for form elements */
+input:focus,
+select:focus {
+    outline: none;
+    ring: 2px;
+}
+
+/* Smooth transitions */
+* {
+    transition: all 0.2s ease-in-out;
+}
+
+/* Custom button hover effects */
+.btn-primary {
+    background-color: #4eac92;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #3a8c74;
+    transform: translateY(-1px);
+}
+
+html {
+    scroll-behavior: smooth;
+}
