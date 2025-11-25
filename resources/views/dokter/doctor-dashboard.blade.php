@@ -37,12 +37,15 @@
         .chat-container {
             height: calc(100vh - 280px);
             min-height: 400px;
+            display: flex;
+            flex-direction: column;
         }
 
         .messages-container {
-            height: calc(100% - 220px);
+            flex: 1;
             overflow-y: auto;
             scroll-behavior: smooth;
+            padding: 1rem;
         }
 
         /* Custom Scrollbar */
@@ -276,6 +279,16 @@
                 height: calc(100vh - 200px);
             }
 
+            .input-area {
+                min-height: 70px;
+                padding: 0.75rem;
+            }
+
+            .preview-area {
+                min-height: 50px;
+                max-height: 100px;
+            }
+
             .sidebar-scroll {
                 max-height: 200px;
             }
@@ -344,6 +357,35 @@
                 max-width: 200px;
             }
         }
+
+        /* ✅ FIXED INPUT WRAPPER */
+        .chat-input-wrapper {
+            position: sticky;
+            bottom: 0;
+            background: white;
+            border-top: 1px solid #e5e7eb;
+            padding: 1rem;
+            margin-top: auto;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ✅ RESPONSIVE ADJUSTMENT */
+        @media (max-width: 768px) {
+            .chat-container {
+                padding-bottom: 160px;
+            }
+        }
     </style>
 </head>
 
@@ -359,7 +401,7 @@
         <div class="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full -mr-32 -mt-32"></div>
         <div class="absolute bottom-0 left-0 w-48 h-48 bg-white opacity-5 rounded-full -ml-24 -mb-24"></div>
 
-        <div class="container mx-auto px-4 text-center relative z-10">
+        <div class="container mx-auto px-4 text-center relative">
             <div class="inline-block mb-4">
                 <div
                     class="w-16 h-16 md:w-20 md:h-20 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto backdrop-blur-sm">
@@ -1043,7 +1085,7 @@
                             <div class="flex items-center space-x-3 bg-white p-3 rounded-lg border border-gray-200 mb-2">
                                 <i class="fas fa-file text-primary text-xl"></i>
                                 <div class="flex-1">
-                                    <div class="font-medium text-sm">${escapeHtml(fileName)}</div>
+                                    <div class="font-medium text-sm text-gray-500">${escapeHtml(fileName)}</div>
                                     <div class="text-xs text-gray-500">File</div>
                                 </div>
                                 <a href="/storage/${chat.attachment_path}" 
@@ -1198,7 +1240,7 @@
             suggestedMessages.forEach(msg => {
                 const btn = document.createElement('button');
                 btn.className =
-                'px-3 py-1 bg-primary text-white text-sm rounded-full hover:bg-secondary transition';
+                    'px-3 py-1 bg-primary text-white text-sm rounded-full hover:bg-secondary transition';
                 btn.textContent = msg;
                 btn.addEventListener('click', () => {
                     const input = document.getElementById('message-input');

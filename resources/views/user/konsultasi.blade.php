@@ -383,7 +383,6 @@
         /* Prevent overflow issues */
         .container {
             max-width: 100%;
-            overflow: hidden;
         }
 
         /* Smooth transitions */
@@ -1022,7 +1021,7 @@
                         <div class="flex items-center space-x-3 bg-white p-3 rounded-lg border border-gray-200 mb-2">
                             <i class="fas fa-file text-primary text-xl"></i>
                             <div class="flex-1">
-                                <div class="font-medium text-sm">${escapeHtml(fileName)}</div>
+                                <div class="font-medium text-sm text-gray-500">${escapeHtml(fileName)}</div>
                                 <div class="text-xs text-gray-500">File</div>
                             </div>
                             <a href="/storage/${message.raw.attachment_path}" 

@@ -19,6 +19,7 @@
             opacity: 0;
             transform: translateY(-10px);
         }
+
         to {
             opacity: 1;
             transform: translateY(0);
@@ -35,6 +36,7 @@
             opacity: 0;
             transform: translateY(-10px);
         }
+
         to {
             opacity: 1;
             transform: translateY(0);
@@ -86,9 +88,12 @@
     }
 
     @keyframes badgePulse {
-        0%, 100% {
+
+        0%,
+        100% {
             transform: scale(1);
         }
+
         50% {
             transform: scale(1.1);
         }
@@ -158,6 +163,7 @@
         from {
             opacity: 0;
         }
+
         to {
             opacity: 1;
         }
@@ -173,6 +179,7 @@
             transform: translateY(20px);
             opacity: 0;
         }
+
         to {
             transform: translateY(0);
             opacity: 1;
@@ -196,10 +203,13 @@
     }
 
     @keyframes dotPulse {
-        0%, 100% {
+
+        0%,
+        100% {
             opacity: 1;
             transform: scale(1);
         }
+
         50% {
             opacity: 0.7;
             transform: scale(1.2);
@@ -307,7 +317,7 @@
         .text-responsive {
             font-size: 0.875rem;
         }
-        
+
         .nav-link {
             padding: 12px 16px;
             margin: 2px 0;
@@ -315,7 +325,11 @@
     }
 
     /* Smooth transitions for all interactive elements */
-    button, a, .nav-link, .profile-avatar, .logo-icon {
+    button,
+    a,
+    .nav-link,
+    .profile-avatar,
+    .logo-icon {
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
@@ -362,7 +376,18 @@
 
                 {{-- Tampilkan menu Konsultasi hanya jika role user --}}
                 @if (Auth::check() && Auth::user()->isUser())
-                    <a href="/konsultasi" class="nav-link text-dark hover:text-primary font-medium py-2">Konsultasi</a>
+                    @if (Auth::user()->hasActiveSubscription())
+                        <a href="/konsultasi" class="nav-link text-dark hover:text-primary font-medium py-2">
+                            <span>👑</span>
+                            <span>Konsultasi</span>
+                        </a>
+                    @else
+                        <a href="/dashboard#konsul_dokter"
+                            class="nav-link text-secondary hover:text-primary font-medium py-2 flex items-center gap-1">
+                            <span>👑</span>
+                            <span>Konsultasi</span>
+                        </a>
+                    @endif
                 @endif
 
                 <a href="/dashboard#kalkulator"

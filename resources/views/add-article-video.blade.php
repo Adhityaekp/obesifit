@@ -379,7 +379,7 @@
         <div class="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full -mr-32 -mt-32"></div>
         <div class="absolute bottom-0 left-0 w-48 h-48 bg-white opacity-5 rounded-full -ml-24 -mb-24"></div>
 
-        <div class="container mx-auto px-4 text-center relative z-10">
+        <div class="container mx-auto px-4 text-center relative">
             <div class="inline-block mb-4">
                 <div
                     class="w-16 h-16 md:w-20 md:h-20 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto backdrop-blur-sm">

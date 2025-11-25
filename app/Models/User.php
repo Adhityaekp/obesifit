@@ -34,6 +34,21 @@ class User extends Authenticatable implements MustVerifyEmail
         'remember_token',
     ];
 
+    // User.php
+    public function subscription()
+    {
+        return $this->hasOne(Subscription::class);
+    }
+
+    public function hasActiveSubscription()
+    {
+        return $this->subscription()
+            ->where('status', 'active')
+            ->where('end_date', '>=', now())
+            ->exists();
+    }
+
+
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
