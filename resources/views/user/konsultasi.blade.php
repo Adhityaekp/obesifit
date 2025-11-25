@@ -31,27 +31,29 @@
     <style>
         body {
             overflow-x: hidden;
+            font-family: 'Poppins', sans-serif;
         }
 
         .chat-container {
             height: calc(100vh - 280px);
             min-height: 400px;
+            display: flex;
+            flex-direction: column;
         }
 
         .messages-container {
-            height: calc(100% - 180px);
+            flex: 1;
             overflow-y: auto;
             scroll-behavior: smooth;
+            padding: 1rem;
         }
 
         /* Custom Scrollbar */
-        .messages-container::-webkit-scrollbar,
-        .sidebar-scroll::-webkit-scrollbar {
+        .messages-container::-webkit-scrollbar {
             width: 6px;
         }
 
-        .messages-container::-webkit-scrollbar-track,
-        .sidebar-scroll::-webkit-scrollbar-track {
+        .messages-container::-webkit-scrollbar-track {
             background: #f1f1f1;
             border-radius: 10px;
         }
@@ -61,13 +63,28 @@
             border-radius: 10px;
         }
 
-        .sidebar-scroll::-webkit-scrollbar-thumb {
-            background: #D1D5DB;
+        .messages-container::-webkit-scrollbar-thumb:hover {
+            background: #3A8C74;
+        }
+
+        /* Sidebar Scroll */
+        .sidebar-scroll {
+            max-height: calc(100vh - 250px);
+            overflow-y: auto;
+        }
+
+        .sidebar-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar-scroll::-webkit-scrollbar-track {
+            background: #f1f1f1;
             border-radius: 10px;
         }
 
-        .messages-container::-webkit-scrollbar-thumb:hover {
-            background: #3A8C74;
+        .sidebar-scroll::-webkit-scrollbar-thumb {
+            background: #D1D5DB;
+            border-radius: 10px;
         }
 
         /* Message Bubbles */
@@ -113,7 +130,7 @@
         }
 
         .consultation-card:hover {
-            transform: translateY(-4px);
+            transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(78, 172, 146, 0.15);
         }
 
@@ -224,12 +241,6 @@
             box-shadow: 0 2px 8px rgba(78, 172, 146, 0.3);
         }
 
-        /* Sidebar Scroll */
-        .sidebar-scroll {
-            max-height: calc(100vh - 250px);
-            overflow-y: auto;
-        }
-
         /* Button Styles */
         .btn-primary {
             background: linear-gradient(135deg, #4EAC92, #3A8C74);
@@ -265,31 +276,6 @@
             }
         }
 
-        /* Responsive Adjustments */
-        @media (max-width: 1024px) {
-            .chat-container {
-                height: calc(100vh - 220px);
-            }
-
-            .messages-container {
-                height: calc(100% - 120px);
-            }
-
-            .sidebar-scroll {
-                max-height: 350px;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .chat-container {
-                height: calc(100vh - 200px);
-            }
-
-            .sidebar-scroll {
-                max-height: 300px;
-            }
-        }
-
         /* Focus States */
         input:focus,
         textarea:focus {
@@ -305,6 +291,104 @@
 
         .consultation-card:hover .doctor-avatar {
             transform: scale(1.05);
+        }
+
+        /* Preview Styles */
+        .preview-container {
+            transition: all 0.3s ease;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .image-preview img {
+            transition: transform 0.3s ease;
+            max-width: 100%;
+            height: auto;
+        }
+
+        .image-preview img:hover {
+            transform: scale(1.02);
+        }
+
+        /* Chat Input Container */
+        .chat-input-wrapper {
+            position: sticky;
+            bottom: 0;
+            background: white;
+            border-top: 1px solid #e5e7eb;
+            padding: 1rem;
+            margin-top: auto;
+        }
+
+        /* File attachment styles */
+        .file-attachment {
+            border-left: 4px solid #4EAC92;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 1024px) {
+            .chat-container {
+                height: calc(100vh - 240px);
+            }
+
+            .sidebar-scroll {
+                max-height: 300px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .chat-container {
+                height: calc(100vh - 220px);
+            }
+
+            .messages-container {
+                padding: 0.75rem;
+            }
+
+            .sidebar-scroll {
+                max-height: 250px;
+            }
+
+            .chat-input-wrapper {
+                padding: 0.75rem;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .chat-container {
+                height: calc(100vh - 200px);
+            }
+
+            .messages-container {
+                padding: 0.5rem;
+            }
+        }
+
+        /* Ensure proper box sizing */
+        * {
+            box-sizing: border-box;
+        }
+
+        /* Prevent overflow issues */
+        .container {
+            max-width: 100%;
+            overflow: hidden;
+        }
+
+        /* Smooth transitions */
+        .transition-all {
+            transition: all 0.3s ease;
         }
     </style>
 </head>
@@ -450,20 +534,60 @@
                             </div>
                         </div>
 
-                        <!-- Input Area - Enhanced -->
-                        <div class="border-t border-gray-200 p-3 md:p-4 bg-white">
+                        <!-- Input Area - Fixed Position -->
+                        <div class="chat-input-wrapper border-t border-gray-200 bg-white">
+                            <!-- Preview Area di ATAS input -->
+                            <div id="file-preview" class="mb-3 hidden preview-container">
+                                <div
+                                    class="flex items-center justify-between bg-gray-50 rounded-lg p-3 border border-gray-200">
+                                    <div class="flex items-center space-x-3">
+                                        <i class="fas fa-file text-primary text-xl"></i>
+                                        <div>
+                                            <div id="file-name" class="font-medium text-sm"></div>
+                                            <div id="file-size" class="text-xs text-gray-500"></div>
+                                        </div>
+                                    </div>
+                                    <button type="button" id="remove-file"
+                                        class="text-gray-400 hover:text-red-500 transition">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Image Preview di ATAS input -->
+                            <div id="image-preview" class="mb-3 hidden preview-container">
+                                <div class="relative inline-block">
+                                    <img id="preview-image"
+                                        class="max-w-xs rounded-lg border-2 border-primary shadow-sm">
+                                    <button type="button" id="remove-image"
+                                        class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600 transition">
+                                        <i class="fas fa-times text-xs"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Form Input -->
                             <div class="flex items-center space-x-2 md:space-x-3">
-                                <button
+                                <!-- File Input Hidden -->
+                                <input type="file" id="file-input" class="hidden"
+                                    accept="image/*,.pdf,.doc,.docx,.txt">
+
+                                <!-- Attachment Button -->
+                                <button type="button" id="attachment-button"
                                     class="w-10 h-10 flex-shrink-0 flex items-center justify-center text-gray-400 hover:text-primary transition rounded-full hover:bg-gray-100">
                                     <i class="fas fa-paperclip text-lg"></i>
                                 </button>
+
+                                <!-- Message Input -->
                                 <div class="flex-1">
                                     <input type="text" placeholder="Ketik pesan Anda..."
                                         class="w-full px-4 md:px-5 py-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition text-sm md:text-base"
                                         id="message-input" disabled>
                                 </div>
+
+                                <!-- Send Button -->
                                 <button
-                                    class="w-12 h-12 flex-shrink-0 btn-primary rounded-full flex items-center justify-center text-white disabled:opacity-50"
+                                    class="w-12 h-12 flex-shrink-0 btn-primary rounded-full flex items-center justify-center text-white disabled:opacity-50 transition-all"
                                     id="send-button" disabled>
                                     <i class="fas fa-paper-plane text-lg"></i>
                                 </button>
@@ -512,21 +636,38 @@
 
     <!-- Footer -->
     <footer class="bg-dark text-white py-8 mt-12">
-        <div class="container mx-auto px-4 text-center">
-            <p class="text-gray-400">&copy; 2025 OBESIFIT. All rights reserved.</p>
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0 text-center md:text-left">
+                    <div class="flex items-center justify-center md:justify-start">
+                        <div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center mr-2">
+                            <i class="fas fa-heartbeat text-white"></i>
+                        </div>
+                        <span class="text-xl font-bold">OBESIFIT</span>
+                    </div>
+                    <p class="text-gray-400 mt-2">Platform Edukasi Obesitas Interaktif</p>
+                </div>
+                <div class="text-center md:text-right">
+                    <p class="text-gray-400">&copy; 2025 OBESIFIT. All rights reserved.</p>
+                </div>
+            </div>
         </div>
     </footer>
 
     <script>
         // ===============================
-        // Variabel global (TIDAK DIUBAH)
+        // Variabel global
         // ===============================
         const sessions = {};
         let selectedDoctorId = null;
+        let currentFile = null;
+        let currentFileType = null;
+        let activeSessionId = null;
+        let lastLoadedCount = 0;
         const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
         // ===============================
-        // Fungsi Backend (TIDAK DIUBAH)
+        // Fungsi Backend
         // ===============================
         async function fetchDoctors() {
             try {
@@ -571,7 +712,7 @@
         }
 
         // ===============================
-        // Render Dokter (Style Update Only)
+        // Render Dokter
         // ===============================
         async function renderDoctors(doctors) {
             const container = document.getElementById('doctors-list');
@@ -659,6 +800,7 @@
                         btnText = 'Minta Konsultasi';
                         btnDisabled = !canRequest;
                         sessions[idKey].status = 'ready';
+                        break;
                     default:
                         if (doctor.is_online && canRequest) {
                             statusBadge =
@@ -678,32 +820,32 @@
                     'w-full py-2.5 rounded-xl font-medium text-sm btn-primary text-white';
 
                 div.innerHTML = `
-                    <div class="flex items-start space-x-3 mb-3">
-                        <img src="${doctor.profile_photo || '/img/default-user.jpg'}" 
-                             alt="${doctor.first_name}" 
-                             class="doctor-avatar w-12 h-12 rounded-full object-cover ring-2 ring-gray-100">
-                        <div class="flex-1 min-w-0">
-                            <div class="font-semibold text-dark truncate">${doctor.first_name} ${doctor.last_name}</div>
-                            <div class="text-sm text-gray-600 truncate">${doctor.specialization || '-'}</div>
-                        </div>
+                <div class="flex items-start space-x-3 mb-3">
+                    <img src="${doctor.profile_photo || '/img/default-user.jpg'}" 
+                         alt="${doctor.first_name}" 
+                         class="doctor-avatar w-12 h-12 rounded-full object-cover ring-2 ring-gray-100">
+                    <div class="flex-1 min-w-0">
+                        <div class="font-semibold text-dark truncate">${doctor.first_name} ${doctor.last_name}</div>
+                        <div class="text-sm text-gray-600 truncate">${doctor.specialization || '-'}</div>
                     </div>
-                    <div class="space-y-2 mb-3 text-xs">
-                        <div class="flex items-center text-gray-500">
-                            <i class="fas fa-calendar-alt w-4 mr-2 text-primary"></i>
-                            <span class="truncate">${doctor.practice_days || '-'}</span>
-                        </div>
-                        <div class="flex items-center text-gray-500">
-                            <i class="fas fa-clock w-4 mr-2 text-primary"></i>
-                            <span>${doctor.practice_start_time || '-'} - ${doctor.practice_end_time || '-'}</span>
-                        </div>
+                </div>
+                <div class="space-y-2 mb-3 text-xs">
+                    <div class="flex items-center text-gray-500">
+                        <i class="fas fa-calendar-alt w-4 mr-2 text-primary"></i>
+                        <span class="truncate">${doctor.practice_days || '-'}</span>
                     </div>
-                    <div class="flex items-center justify-between mb-3">
-                        ${statusBadge}
+                    <div class="flex items-center text-gray-500">
+                        <i class="fas fa-clock w-4 mr-2 text-primary"></i>
+                        <span>${doctor.practice_start_time || '-'} - ${doctor.practice_end_time || '-'}</span>
                     </div>
-                    <button id="request-${idKey}" class="${btnClass}" ${btnDisabled ? 'disabled' : ''}>
-                        ${btnText}
-                    </button>
-                `;
+                </div>
+                <div class="flex items-center justify-between mb-3">
+                    ${statusBadge}
+                </div>
+                <button id="request-${idKey}" class="${btnClass}" ${btnDisabled ? 'disabled' : ''}>
+                    ${btnText}
+                </button>
+            `;
                 container.appendChild(div);
 
                 const btn = document.getElementById(`request-${idKey}`);
@@ -728,7 +870,7 @@
         }
 
         // ===============================
-        // Modal Handlers (TIDAK DIUBAH)
+        // Modal Handlers
         // ===============================
         document.getElementById('cancel-consultation').addEventListener('click', () => {
             document.getElementById('consultation-modal').classList.add('hidden');
@@ -777,9 +919,6 @@
                 document.getElementById('consultation-modal').classList.add('hidden');
                 document.getElementById('consultation-reason').value = '';
                 selectedDoctorId = null;
-
-                // NOTE: jangan pakai simulasi approve di production.
-                // Jika mau testing lokal, kamu bisa biarkan simulasi ini.
             } catch (err) {
                 alert(err.message || 'Gagal mengirim request');
                 btn.disabled = false;
@@ -809,14 +948,12 @@
 
             // Load chat history dari backend (jika consultation_id tersedia)
             if (!session.consultation_id) {
-                // coba ambil lagi
                 session.consultation_id = await fetchConsultationId(doctor.id);
             }
 
             if (session.consultation_id) {
                 await loadChatHistory(session);
             } else {
-                // kosongkan pesan jika belum ada consultation
                 session.messages = [];
                 renderMessages(session.messages);
             }
@@ -836,7 +973,7 @@
                 const chats = await res.json();
                 session.messages = chats.map(c => ({
                     type: c.sender_id === session.expert.id ? 'expert' : 'user',
-                    text: c.message || '[Attachment]',
+                    text: c.message,
                     time: (new Date(c.created_at)).toLocaleTimeString([], {
                         hour: '2-digit',
                         minute: '2-digit'
@@ -844,8 +981,6 @@
                     raw: c
                 }));
                 renderMessages(session.messages);
-
-                // scroll ke bawah
                 scrollToBottom();
             } catch (err) {
                 console.error('Gagal load chat history', err);
@@ -853,47 +988,215 @@
         }
 
         // ===============================
-        // Render pesan chat
+        // Render pesan chat dengan attachment support
         // ===============================
         function renderMessages(messages) {
             const chatMessages = document.getElementById('chat-messages');
             chatMessages.innerHTML = '';
+
             messages.forEach(message => {
                 const el = document.createElement('div');
                 el.className = `flex mb-4 ${message.type === 'user' ? 'justify-end' : 'justify-start'}`;
+
+                let messageContent = '';
+
+                // Cek jika ada attachment
+                if (message.raw.attachment_path) {
+                    const attachmentType = message.raw.type;
+
+                    if (attachmentType === 'image') {
+                        messageContent = `
+                        <div class="mb-2">
+                            <img src="/storage/${message.raw.attachment_path}" 
+                                 alt="Gambar" 
+                                 class="max-w-xs rounded-lg cursor-pointer hover:opacity-90 transition border border-gray-200"
+                                 onclick="openImageModal('/storage/${message.raw.attachment_path}')">
+                        </div>
+                        ${message.raw.message && message.raw.message !== '[Mengirim gambar]' ? 
+                          `<div class="text-sm mt-2">${escapeHtml(message.raw.message)}</div>` : ''}
+                    `;
+                    } else {
+                        // Untuk file non-gambar
+                        const fileName = message.raw.attachment_path.split('/').pop() || 'File';
+                        messageContent = `
+                        <div class="flex items-center space-x-3 bg-white p-3 rounded-lg border border-gray-200 mb-2">
+                            <i class="fas fa-file text-primary text-xl"></i>
+                            <div class="flex-1">
+                                <div class="font-medium text-sm">${escapeHtml(fileName)}</div>
+                                <div class="text-xs text-gray-500">File</div>
+                            </div>
+                            <a href="/storage/${message.raw.attachment_path}" 
+                               download="${fileName}"
+                               class="text-primary hover:text-secondary transition">
+                                <i class="fas fa-download"></i>
+                            </a>
+                        </div>
+                        ${message.raw.message && message.raw.message !== '[Mengirim file]' ? 
+                          `<div class="text-sm mt-2">${escapeHtml(message.raw.message)}</div>` : ''}
+                    `;
+                    }
+                } else {
+                    // Pesan teks biasa
+                    messageContent = escapeHtml(message.text);
+                }
+
                 el.innerHTML = `
-                    <div class="max-w-xs lg:max-w-md">
-                        <div class="${message.type === 'user' ? 'message-user' : 'message-expert'} px-4 py-2">
-                            ${escapeHtml(message.text)}
-                        </div>
-                        <div class="text-xs text-gray-500 mt-1 ${message.type === 'user' ? 'text-right' : 'text-left'}">
-                            ${escapeHtml(message.time)}
-                        </div>
+                <div class="max-w-xs lg:max-w-md">
+                    <div class="${message.type === 'user' ? 'message-user' : 'message-expert'} px-4 py-2">
+                        ${messageContent}
                     </div>
-                `;
+                    <div class="text-xs text-gray-500 mt-1 ${message.type === 'user' ? 'text-right' : 'text-left'}">
+                        ${escapeHtml(message.time)}
+                    </div>
+                </div>
+            `;
                 chatMessages.appendChild(el);
             });
 
             scrollToBottom();
         }
 
-        function scrollToBottom() {
-            const container = document.querySelector('.messages-container');
-            if (container) {
-                container.scrollTop = container.scrollHeight;
+        // ===============================
+        // File Handling Functions
+        // ===============================
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            currentFile = file;
+
+            // Cek tipe file
+            if (file.type.startsWith('image/')) {
+                currentFileType = 'image';
+                showImagePreview(file);
+            } else {
+                currentFileType = 'file';
+                showFilePreview(file);
+            }
+
+            // Clear text input
+            document.getElementById('message-input').value = '';
+        }
+
+        function showImagePreview(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('preview-image').src = e.target.result;
+                document.getElementById('image-preview').classList.remove('hidden');
+                document.getElementById('file-preview').classList.add('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function showFilePreview(file) {
+            document.getElementById('file-name').textContent = file.name;
+            document.getElementById('file-size').textContent = formatFileSize(file.size);
+            document.getElementById('file-preview').classList.remove('hidden');
+            document.getElementById('image-preview').classList.add('hidden');
+        }
+
+        function clearFile() {
+            currentFile = null;
+            currentFileType = null;
+            document.getElementById('file-input').value = '';
+            document.getElementById('file-preview').classList.add('hidden');
+            document.getElementById('image-preview').classList.add('hidden');
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // ===============================
+        // Kirim pesan (support text dan file)
+        // ===============================
+        async function sendMessage() {
+            const input = document.getElementById('message-input');
+            const text = input.value.trim();
+
+            // Jika tidak ada file dan tidak ada text, return
+            if (!currentFile && !text) return;
+
+            if (!activeSessionId) return;
+
+            const session = sessions[activeSessionId];
+
+            if (!session.consultation_id) {
+                alert('Konsultasi belum aktif. Pastikan dokter sudah menyetujui request.');
+                return;
+            }
+
+            // Disable input sementara
+            document.getElementById('send-button').disabled = true;
+
+            try {
+                const formData = new FormData();
+                formData.append('consultation_id', session.consultation_id);
+
+                // Jika ada file, kirim text atau default message
+                if (currentFile) {
+                    if (text) {
+                        formData.append('message', text);
+                    } else {
+                        // Default message berdasarkan tipe file
+                        if (currentFileType === 'image') {
+                            formData.append('message', '[Mengirim gambar]');
+                        } else {
+                            formData.append('message', '[Mengirim file]');
+                        }
+                    }
+                    formData.append('attachment', currentFile);
+                    formData.append('type', currentFileType);
+                } else {
+                    // Jika hanya text
+                    formData.append('message', text);
+                    formData.append('type', 'text');
+                }
+
+                const res = await fetch('/chats', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': CSRF_TOKEN,
+                        'Accept': 'application/json'
+                    },
+                    body: formData
+                });
+
+                if (!res.ok) {
+                    const err = await res.json().catch(() => ({}));
+                    throw new Error(err.message || 'Gagal mengirim pesan');
+                }
+
+                const saved = await res.json();
+
+                // Tambahkan ke UI
+                session.messages.push({
+                    type: 'user',
+                    text: saved.message,
+                    time: getTime(),
+                    raw: saved
+                });
+
+                renderMessages(session.messages);
+
+                // Reset form
+                input.value = '';
+                clearFile();
+
+            } catch (err) {
+                alert(err.message || 'Gagal mengirim pesan');
+            } finally {
+                document.getElementById('send-button').disabled = false;
             }
         }
 
-        // sederhana escape HTML
-        function escapeHtml(unsafe) {
-            return String(unsafe)
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
-        }
-
+        // ===============================
+        // Riwayat Konsultasi
+        // ===============================
         async function fetchConsultationHistory() {
             try {
                 const res = await fetch('/consultations/patient?status=complete', {
@@ -925,12 +1228,11 @@
                 div.className =
                     'consultation-card p-3 bg-white rounded-2xl shadow-sm border border-gray-200 cursor-pointer hover:shadow-md';
                 div.innerHTML = `
-            <div class="font-semibold text-dark">${h.doctor.first_name} ${h.doctor.last_name}</div>
-            <div class="text-sm text-gray-600">${h.doctor.specialization || '-'}</div>
-            <div class="text-xs text-gray-500 mt-1">${new Date(h.created_at).toLocaleDateString()} - Selesai</div>
-        `;
+                <div class="font-semibold text-dark">${h.doctor.first_name} ${h.doctor.last_name}</div>
+                <div class="text-sm text-gray-600">${h.doctor.specialization || '-'}</div>
+                <div class="text-xs text-gray-500 mt-1">${new Date(h.created_at).toLocaleDateString()} - Selesai</div>
+            `;
                 div.addEventListener('click', async () => {
-                    // buka chat history readonly
                     const sessionId = `history-${h.id}`;
                     sessions[sessionId] = {
                         status: 'complete',
@@ -972,7 +1274,7 @@
                 const chats = await res.json();
                 session.messages = chats.map(c => ({
                     type: c.sender_id === doctor.id ? 'expert' : 'user',
-                    text: c.message || '[Attachment]',
+                    text: c.message,
                     time: (new Date(c.created_at)).toLocaleTimeString([], {
                         hour: '2-digit',
                         minute: '2-digit'
@@ -986,86 +1288,101 @@
         }
 
         // ===============================
-        // Kirim pesan ke backend
+        // Modal untuk preview gambar besar
+        // ===============================
+        function openImageModal(imageUrl) {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4';
+            modal.innerHTML = `
+            <div class="relative max-w-4xl max-h-full">
+                <img src="${imageUrl}" class="max-w-full max-h-full rounded-lg">
+                <button class="absolute top-4 right-4 text-white text-2xl hover:text-gray-300 transition" onclick="this.parentElement.parentElement.remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+                <a href="${imageUrl}" download class="absolute top-4 left-4 text-white text-xl hover:text-gray-300 transition">
+                    <i class="fas fa-download"></i>
+                </a>
+            </div>
+        `;
+            document.body.appendChild(modal);
+
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.remove();
+                }
+            });
+        }
+
+        // ===============================
+        // Fungsi Bantuan
         // ===============================
         function getTime() {
             const now = new Date();
             return now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
         }
 
-        async function sendMessage() {
-            const input = document.getElementById('message-input');
-            const text = input.value.trim();
-            if (!text) return;
+        function escapeHtml(unsafe) {
+            return String(unsafe)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
 
-            // Session aktif
-            const activeSessionId = Object.keys(sessions).find(id => {
-                const doctorName = document.getElementById('current-expert-name').textContent;
-                const session = sessions[id];
-                return session.expert.first_name + ' ' + session.expert.last_name === doctorName;
-            });
-
-            if (!activeSessionId) return;
-
-            const session = sessions[activeSessionId];
-
-            if (!session.consultation_id) {
-                alert('Konsultasi belum aktif. Pastikan dokter sudah menyetujui request.');
-                return;
-            }
-
-            // Disable input sementara
-            document.getElementById('send-button').disabled = true;
-
-            try {
-                const res = await fetch('/chats', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': CSRF_TOKEN,
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        consultation_id: session.consultation_id,
-                        message: text,
-                        type: 'text'
-                    })
-                });
-
-                if (!res.ok) {
-                    const err = await res.json().catch(() => ({}));
-                    throw new Error(err.message || 'Gagal mengirim pesan');
-                }
-
-                const saved = await res.json();
-
-                // Tambahkan ke UI
-                session.messages.push({
-                    type: 'user',
-                    text,
-                    time: getTime(),
-                    raw: saved
-                });
-
-                renderMessages(session.messages);
-
-                input.value = '';
-            } catch (err) {
-                alert(err.message || 'Gagal mengirim pesan');
-            } finally {
-                document.getElementById('send-button').disabled = false;
+        function scrollToBottom() {
+            const container = document.querySelector('.messages-container');
+            if (container) {
+                container.scrollTop = container.scrollHeight;
             }
         }
 
+        // ===============================
+        // Suggested Messages
+        // ===============================
+        const suggestedMessages = [
+            "Saya ingin konsultasi tentang diet saya",
+            "Saya mengalami masalah pencernaan",
+            "Saya ingin cek perkembangan berat badan saya",
+            "Bolehkah saya minta saran olahraga ringan?"
+        ];
+
+        function renderSuggestedMessages() {
+            const container = document.getElementById('suggested-messages');
+            container.innerHTML = '';
+            suggestedMessages.forEach(msg => {
+                const btn = document.createElement('button');
+                btn.className =
+                'px-3 py-1 bg-primary text-white text-sm rounded-full hover:bg-secondary transition';
+                btn.textContent = msg;
+                btn.addEventListener('click', () => {
+                    const input = document.getElementById('message-input');
+                    input.value = msg;
+                    input.focus();
+                });
+                container.appendChild(btn);
+            });
+        }
+
+        // ===============================
+        // Event Listeners
+        // ===============================
         document.getElementById('send-button').addEventListener('click', sendMessage);
         document.getElementById('message-input').addEventListener('keypress', e => {
             if (e.key === 'Enter') sendMessage();
         });
 
-        // ====== Refresh chat otomatis ======
-        let activeSessionId = null;
-        let lastLoadedCount = 0;
+        document.getElementById('attachment-button').addEventListener('click', () => {
+            document.getElementById('file-input').click();
+        });
 
+        document.getElementById('file-input').addEventListener('change', handleFileSelect);
+        document.getElementById('remove-file').addEventListener('click', clearFile);
+        document.getElementById('remove-image').addEventListener('click', clearFile);
+
+        // ===============================
+        // Auto Refresh Chat
+        // ===============================
         setInterval(async () => {
             if (!activeSessionId) return;
 
@@ -1093,39 +1410,12 @@
             } catch (err) {
                 console.error("Refresh error:", err);
             }
-
         }, 2000);
 
-        const suggestedMessages = [
-            "Saya ingin konsultasi tentang diet saya",
-            "Saya mengalami masalah pencernaan",
-            "Saya ingin cek perkembangan berat badan saya",
-            "Bolehkah saya minta saran olahraga ringan?"
-        ];
-
-        function renderSuggestedMessages() {
-            const container = document.getElementById('suggested-messages');
-            container.innerHTML = '';
-            suggestedMessages.forEach(msg => {
-                const btn = document.createElement('button');
-                btn.className =
-                    'px-3 py-1 bg-primary text-white text-sm rounded-full hover:bg-secondary transition';
-                btn.textContent = msg;
-                btn.addEventListener('click', () => {
-                    const input = document.getElementById('message-input');
-                    input.value = msg;
-                    input.focus();
-                });
-                container.appendChild(btn);
-            });
-        }
-
-        // Jalankan setelah halaman siap
+        // ===============================
+        // Inisialisasi
+        // ===============================
         renderSuggestedMessages();
-
-        // ===============================
-        // Load dokter saat halaman siap
-        // ===============================
         fetchDoctors();
         fetchConsultationHistory();
     </script>

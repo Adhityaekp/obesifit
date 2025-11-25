@@ -298,6 +298,52 @@
         .patient-card:hover .patient-avatar {
             transform: scale(1.05);
         }
+
+        /* Tambahkan di bagian CSS */
+        .preview-container {
+            transition: all 0.3s ease;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .image-preview img {
+            transition: transform 0.3s ease;
+            max-width: 100%;
+            height: auto;
+        }
+
+        .image-preview img:hover {
+            transform: scale(1.02);
+        }
+
+        /* Adjust messages container height */
+        .messages-container {
+            height: calc(100% - 250px);
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .messages-container {
+                height: calc(100% - 220px);
+            }
+
+            #preview-image {
+                max-width: 200px;
+            }
+        }
     </style>
 </head>
 
@@ -453,17 +499,57 @@
 
                         <!-- Input Area -->
                         <div class="border-t border-gray-200 p-3 md:p-4 bg-white">
+                            <!-- Preview Area di ATAS input -->
+                            <div id="file-preview" class="mb-3 hidden preview-container">
+                                <div
+                                    class="flex items-center justify-between bg-gray-50 rounded-lg p-3 border border-gray-200">
+                                    <div class="flex items-center space-x-3">
+                                        <i class="fas fa-file text-primary text-xl"></i>
+                                        <div>
+                                            <div id="file-name" class="font-medium text-sm"></div>
+                                            <div id="file-size" class="text-xs text-gray-500"></div>
+                                        </div>
+                                    </div>
+                                    <button type="button" id="remove-file"
+                                        class="text-gray-400 hover:text-red-500 transition">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Image Preview di ATAS input -->
+                            <div id="image-preview" class="mb-3 hidden preview-container">
+                                <div class="relative inline-block">
+                                    <img id="preview-image"
+                                        class="max-w-xs rounded-lg border-2 border-primary shadow-sm">
+                                    <button type="button" id="remove-image"
+                                        class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600 transition">
+                                        <i class="fas fa-times text-xs"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Form Input -->
                             <div class="flex items-center space-x-2 md:space-x-3">
-                                <button
+                                <!-- File Input Hidden -->
+                                <input type="file" id="file-input" class="hidden"
+                                    accept="image/*,.pdf,.doc,.docx,.txt">
+
+                                <!-- Attachment Button -->
+                                <button type="button" id="attachment-button"
                                     class="w-10 h-10 flex-shrink-0 flex items-center justify-center text-gray-400 hover:text-primary transition rounded-full hover:bg-gray-100">
                                     <i class="fas fa-paperclip text-lg"></i>
                                 </button>
+
+                                <!-- Message Input -->
                                 <div class="flex-1">
                                     <input type="text" placeholder="Ketik pesan untuk pasien..."
                                         id="message-input"
                                         class="w-full px-4 md:px-5 py-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition text-sm md:text-base"
                                         disabled>
                                 </div>
+
+                                <!-- Send Button -->
                                 <button id="send-button"
                                     class="w-12 h-12 flex-shrink-0 btn-primary rounded-full flex items-center justify-center text-white disabled:opacity-50"
                                     disabled>
@@ -514,21 +600,50 @@
 
     <!-- Footer -->
     <footer class="bg-dark text-white py-8 mt-12">
-        <div class="container mx-auto px-4 text-center">
-            <p class="text-gray-400">&copy; 2025 OBESIFIT. All rights reserved.</p>
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0 text-center md:text-left">
+                    <div class="flex items-center justify-center md:justify-start">
+                        <div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center mr-2">
+                            <i class="fas fa-heartbeat text-white"></i>
+                        </div>
+                        <span class="text-xl font-bold">OBESIFIT</span>
+                    </div>
+                    <p class="text-gray-400 mt-2">Platform Edukasi Obesitas Interaktif</p>
+                </div>
+                <div class="text-center md:text-right">
+                    <p class="text-gray-400">&copy; 2025 OBESIFIT. All rights reserved.</p>
+                </div>
+            </div>
         </div>
     </footer>
 
     <script>
-        // ====== CONFIG (TIDAK DIUBAH) ======
+        // ====== VARIABLES ======
         const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]').content;
         const CURRENT_DOCTOR_ID = {{ auth()->id() ?? 'null' }};
         let currentConsultationId = null;
+        let currentFile = null;
+        let currentFileType = null;
+        let lastLoadedCount = 0;
+        let rejectPatient = null;
+        let rejectCard = null;
 
-        // ====== HELPERS (TIDAK DIUBAH) ======
+        // ====== DOM ELEMENTS ======
+        const modal = document.getElementById('consultation-modal');
+        const textarea = document.getElementById('consultation-reason');
+        const cancelBtn = document.getElementById('cancel-consultation');
+        const submitBtn = document.getElementById('submit-consultation');
+        const closeBtn = document.getElementById('close-reject-modal');
+
+        // ====== HELPER FUNCTIONS ======
         function escapeHtml(unsafe) {
-            return String(unsafe).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+            return String(unsafe)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
         }
 
         function scrollChatToBottom() {
@@ -545,29 +660,104 @@
             return now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
         }
 
-        // ====== FETCH LISTS (TIDAK DIUBAH) ======
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // ====== FILE HANDLING FUNCTIONS ======
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            currentFile = file;
+
+            if (file.type.startsWith('image/')) {
+                currentFileType = 'image';
+                showImagePreview(file);
+            } else {
+                currentFileType = 'file';
+                showFilePreview(file);
+            }
+
+            document.getElementById('message-input').value = '';
+        }
+
+        function showImagePreview(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('preview-image').src = e.target.result;
+                document.getElementById('image-preview').classList.remove('hidden');
+                document.getElementById('file-preview').classList.add('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function showFilePreview(file) {
+            document.getElementById('file-name').textContent = file.name;
+            document.getElementById('file-size').textContent = formatFileSize(file.size);
+            document.getElementById('file-preview').classList.remove('hidden');
+            document.getElementById('image-preview').classList.add('hidden');
+        }
+
+        function clearFile() {
+            currentFile = null;
+            currentFileType = null;
+            document.getElementById('file-input').value = '';
+            document.getElementById('file-preview').classList.add('hidden');
+            document.getElementById('image-preview').classList.add('hidden');
+        }
+
+        function openImageModal(imageUrl) {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4';
+            modal.innerHTML = `
+            <div class="relative max-w-4xl max-h-full">
+                <img src="${imageUrl}" class="max-w-full max-h-full rounded-lg">
+                <button class="absolute top-4 right-4 text-white text-2xl hover:text-gray-300 transition" onclick="this.parentElement.parentElement.remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+                <a href="${imageUrl}" download class="absolute top-4 left-4 text-white text-xl hover:text-gray-300 transition">
+                    <i class="fas fa-download"></i>
+                </a>
+            </div>
+        `;
+            document.body.appendChild(modal);
+
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.remove();
+                }
+            });
+        }
+
+        // ====== DATA FETCHING ======
         async function fetchPatients() {
             try {
-                const resPending = await fetch('/consultations/doctor', {
-                    headers: {
-                        'Accept': 'application/json'
-                    }
-                });
-                const pendingData = resPending.ok ? await resPending.json() : [];
+                const [pendingRes, approvedRes, historyRes] = await Promise.all([
+                    fetch('/consultations/doctor', {
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    }),
+                    fetch('/consultations/doctor/approved', {
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    }),
+                    fetch('/consultations/doctor/history', {
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    })
+                ]);
 
-                const resApproved = await fetch('/consultations/doctor/approved', {
-                    headers: {
-                        'Accept': 'application/json'
-                    }
-                });
-                const approvedData = resApproved.ok ? await resApproved.json() : [];
-
-                const resHistory = await fetch('/consultations/doctor/history', {
-                    headers: {
-                        'Accept': 'application/json'
-                    }
-                });
-                const historyData = resHistory.ok ? await resHistory.json() : [];
+                const pendingData = pendingRes.ok ? await pendingRes.json() : [];
+                const approvedData = approvedRes.ok ? await approvedRes.json() : [];
+                const historyData = historyRes.ok ? await historyRes.json() : [];
 
                 renderPatients(pendingData || []);
                 renderApprovedPatients(approvedData || []);
@@ -578,7 +768,7 @@
             }
         }
 
-        // ====== RENDER PENDING (STYLE UPDATE) ======
+        // ====== RENDER FUNCTIONS ======
         function renderPatients(patients) {
             const container = document.getElementById('patients-list');
             const countEl = document.getElementById('pending-count');
@@ -587,76 +777,20 @@
 
             if (patients.length === 0) {
                 container.innerHTML = `
-                    <div class="text-center py-8">
-                        <i class="fas fa-inbox text-3xl text-gray-300 mb-2"></i>
-                        <p class="text-sm text-gray-500">Tidak ada request</p>
-                    </div>
-                `;
+                <div class="text-center py-8">
+                    <i class="fas fa-inbox text-3xl text-gray-300 mb-2"></i>
+                    <p class="text-sm text-gray-500">Tidak ada request</p>
+                </div>
+            `;
                 return;
             }
 
             patients.forEach(p => {
-                const card = document.createElement('div');
-                card.className = 'patient-card p-4 bg-white rounded-xl shadow-sm border border-gray-100';
-                card.dataset.id = p.id;
-                card.innerHTML = `
-                    <div class="flex items-start space-x-3 mb-3">
-                        <img src="${p.patient_avatar || '/img/default-user.jpg'}" 
-                             alt="${escapeHtml(p.patient_name)}"
-                             class="patient-avatar w-12 h-12 rounded-full object-cover ring-2 ring-yellow-100">
-                        <div class="flex-1 min-w-0">
-                            <div class="font-semibold text-dark truncate">${escapeHtml(p.patient_name)}</div>
-                            <div class="text-xs text-gray-500">Request: ${escapeHtml(p.request_date)}</div>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <span class="status-badge status-pending">
-                            <i class="fas fa-clock mr-1 text-xs"></i>Menunggu
-                        </span>
-                    </div>
-                    <div class="flex gap-2">
-                        <button class="approve-btn flex-1 btn-primary text-white text-sm rounded-xl py-2 font-medium">
-                            <i class="fas fa-check mr-1"></i>Approve
-                        </button>
-                        <button class="reject-btn flex-1 bg-gray-300 hover:bg-gray-400 text-dark text-sm rounded-xl py-2 transition font-medium">
-                            <i class="fas fa-times mr-1"></i>Tolak
-                        </button>
-                    </div>
-                `;
-
-                const approveBtn = card.querySelector('.approve-btn');
-                const rejectBtn = card.querySelector('.reject-btn');
-
-                approveBtn.addEventListener('click', async () => {
-                    if (!confirm('Setujui konsultasi ini?')) return;
-                    try {
-                        approveBtn.disabled = true;
-                        approveBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i>Proses...';
-                        const res = await fetch(`/consultations/${p.id}/approve`, {
-                            method: 'POST',
-                            headers: {
-                                'X-CSRF-TOKEN': CSRF_TOKEN,
-                                'Accept': 'application/json'
-                            }
-                        });
-                        if (!res.ok) throw new Error('Gagal approve');
-                        await fetchPatients();
-                    } catch (err) {
-                        console.error(err);
-                        approveBtn.disabled = false;
-                        approveBtn.innerHTML = '<i class="fas fa-check mr-1"></i>Approve';
-                    }
-                });
-
-                rejectBtn.addEventListener('click', () => {
-                    openRejectModal(p, card);
-                });
-
+                const card = createPatientCard(p, 'pending');
                 container.appendChild(card);
             });
         }
 
-        // ====== RENDER APPROVED (STYLE UPDATE) ======
         function renderApprovedPatients(patients) {
             const container = document.getElementById('approved-patients-list');
             const countEl = document.getElementById('active-count');
@@ -665,78 +799,178 @@
 
             if (patients.length === 0) {
                 container.innerHTML = `
-                    <div class="text-center py-8">
-                        <i class="fas fa-comment-slash text-3xl text-gray-300 mb-2"></i>
-                        <p class="text-sm text-gray-500">Belum ada chat aktif</p>
-                    </div>
-                `;
+                <div class="text-center py-8">
+                    <i class="fas fa-comment-slash text-3xl text-gray-300 mb-2"></i>
+                    <p class="text-sm text-gray-500">Belum ada chat aktif</p>
+                </div>
+            `;
                 return;
             }
 
             patients.forEach(p => {
-                const card = document.createElement('div');
-                card.className =
-                    'consultation-card p-4 bg-white rounded-xl shadow-sm border border-gray-100 hover:border-primary';
-                card.dataset.id = p.id;
-
-                card.innerHTML = `
-                    <div class="flex items-start space-x-3 mb-3">
-                        <img src="${p.patient_avatar || '/img/default-user.jpg'}" 
-                             alt="${escapeHtml(p.patient_name)}"
-                             class="patient-avatar w-12 h-12 rounded-full object-cover ring-2 ring-green-100">
-                        <div class="flex-1 min-w-0">
-                            <div class="font-semibold text-dark truncate">${escapeHtml(p.patient_name)}</div>
-                            <div class="text-xs text-gray-500">${p.approved_at ? 'Diterima ' + escapeHtml(p.approved_at) : ''}</div>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <span class="status-badge status-approved">
-                            <i class="fas fa-check-circle mr-1 text-xs"></i>Aktif
-                        </span>
-                    </div>
-                    <div class="flex gap-2">
-                        <button class="open-chat-btn flex-1 btn-primary text-white text-sm rounded-xl py-2 font-medium">
-                            <i class="fas fa-comments mr-1"></i>Buka Chat
-                        </button>
-                        <button class="complete-btn flex-1 btn-danger text-white text-sm rounded-xl py-2 font-medium">
-                            <i class="fas fa-check-double mr-1"></i>Selesai
-                        </button>
-                    </div>
-                `;
-
-                card.querySelector(".open-chat-btn").addEventListener("click", async () => {
-                    selectApprovedPatient(p);
-                    currentConsultationId = p.id;
-                    await loadChatMessages(p.id);
-                });
-
-                card.querySelector(".complete-btn").addEventListener("click", async () => {
-                    if (!confirm("Selesaikan konsultasi ini?")) return;
-
-                    try {
-                        const res = await fetch(`/consultations/${p.id}/complete`, {
-                            method: "POST",
-                            headers: {
-                                "Accept": "application/json",
-                                "X-CSRF-TOKEN": CSRF_TOKEN,
-                            }
-                        });
-
-                        if (!res.ok) throw new Error("Gagal menyelesaikan konsultasi");
-
-                        await fetchPatients();
-                        alert("Konsultasi selesai");
-                    } catch (err) {
-                        console.error(err);
-                        alert("Terjadi kesalahan");
-                    }
-                });
-
+                const card = createPatientCard(p, 'approved');
                 container.appendChild(card);
             });
         }
 
-        // ====== SELECT APPROVED PATIENT (TIDAK DIUBAH) ======
+        function renderHistoryPatients(patients) {
+            const container = document.getElementById('history-patients-list');
+            container.innerHTML = '';
+
+            if (patients.length === 0) {
+                container.innerHTML = `
+                <div class="text-center py-8">
+                    <i class="fas fa-clipboard-check text-3xl text-gray-300 mb-2"></i>
+                    <p class="text-sm text-gray-500">Belum ada riwayat</p>
+                </div>
+            `;
+                return;
+            }
+
+            patients.forEach(p => {
+                const card = createPatientCard(p, 'history');
+                container.appendChild(card);
+            });
+        }
+
+        function createPatientCard(patient, type) {
+            const card = document.createElement('div');
+
+            if (type === 'pending') {
+                card.className = 'patient-card p-4 bg-white rounded-xl shadow-sm border border-gray-100';
+                card.innerHTML = `
+                <div class="flex items-start space-x-3 mb-3">
+                    <img src="${patient.patient_avatar || '/img/default-user.jpg'}" 
+                         alt="${escapeHtml(patient.patient_name)}"
+                         class="patient-avatar w-12 h-12 rounded-full object-cover ring-2 ring-yellow-100">
+                    <div class="flex-1 min-w-0">
+                        <div class="font-semibold text-dark truncate">${escapeHtml(patient.patient_name)}</div>
+                        <div class="text-xs text-gray-500">Request: ${escapeHtml(patient.request_date)}</div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <span class="status-badge status-pending">
+                        <i class="fas fa-clock mr-1 text-xs"></i>Menunggu
+                    </span>
+                </div>
+                <div class="flex gap-2">
+                    <button class="approve-btn flex-1 btn-primary text-white text-sm rounded-xl py-2 font-medium">
+                        <i class="fas fa-check mr-1"></i>Approve
+                    </button>
+                    <button class="reject-btn flex-1 bg-gray-300 hover:bg-gray-400 text-dark text-sm rounded-xl py-2 transition font-medium">
+                        <i class="fas fa-times mr-1"></i>Tolak
+                    </button>
+                </div>
+            `;
+
+                card.querySelector('.approve-btn').addEventListener('click', () => handleApprove(patient, card));
+                card.querySelector('.reject-btn').addEventListener('click', () => openRejectModal(patient, card));
+
+            } else if (type === 'approved') {
+                card.className =
+                    'consultation-card p-4 bg-white rounded-xl shadow-sm border border-gray-100 hover:border-primary';
+                card.innerHTML = `
+                <div class="flex items-start space-x-3 mb-3">
+                    <img src="${patient.patient_avatar || '/img/default-user.jpg'}" 
+                         alt="${escapeHtml(patient.patient_name)}"
+                         class="patient-avatar w-12 h-12 rounded-full object-cover ring-2 ring-green-100">
+                    <div class="flex-1 min-w-0">
+                        <div class="font-semibold text-dark truncate">${escapeHtml(patient.patient_name)}</div>
+                        <div class="text-xs text-gray-500">${patient.approved_at ? 'Diterima ' + escapeHtml(patient.approved_at) : ''}</div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <span class="status-badge status-approved">
+                        <i class="fas fa-check-circle mr-1 text-xs"></i>Aktif
+                    </span>
+                </div>
+                <div class="flex gap-2">
+                    <button class="open-chat-btn flex-1 btn-primary text-white text-sm rounded-xl py-2 font-medium">
+                        <i class="fas fa-comments mr-1"></i>Buka Chat
+                    </button>
+                    <button class="complete-btn flex-1 btn-danger text-white text-sm rounded-xl py-2 font-medium">
+                        <i class="fas fa-check-double mr-1"></i>Selesai
+                    </button>
+                </div>
+            `;
+
+                card.querySelector('.open-chat-btn').addEventListener('click', () => selectApprovedPatient(patient));
+                card.querySelector('.complete-btn').addEventListener('click', () => handleComplete(patient));
+
+            } else if (type === 'history') {
+                card.className =
+                    'consultation-card p-4 bg-gray-50 rounded-xl shadow-sm border border-gray-200 hover:bg-gray-100';
+                card.innerHTML = `
+                <div class="flex items-start space-x-3 mb-2">
+                    <img src="${patient.patient_avatar || '/img/default-user.jpg'}" 
+                         alt="${escapeHtml(patient.patient_name)}"
+                         class="patient-avatar w-10 h-10 rounded-full object-cover ring-2 ring-gray-200">
+                    <div class="flex-1 min-w-0">
+                        <div class="font-semibold text-dark text-sm truncate">${escapeHtml(patient.patient_name)}</div>
+                        <div class="text-xs text-gray-500">Selesai: ${escapeHtml(patient.completed_at || '')}</div>
+                    </div>
+                </div>
+                <div class="mt-2">
+                    <span class="status-badge status-complete">
+                        <i class="fas fa-check-double mr-1 text-xs"></i>Selesai
+                    </span>
+                </div>
+            `;
+
+                card.addEventListener('click', () => openHistoryChat(patient));
+            }
+
+            card.dataset.id = patient.id;
+            return card;
+        }
+
+        // ====== PATIENT ACTIONS ======
+        async function handleApprove(patient, card) {
+            if (!confirm('Setujui konsultasi ini?')) return;
+
+            const approveBtn = card.querySelector('.approve-btn');
+            try {
+                approveBtn.disabled = true;
+                approveBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i>Proses...';
+
+                const res = await fetch(`/consultations/${patient.id}/approve`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': CSRF_TOKEN,
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (!res.ok) throw new Error('Gagal approve');
+                await fetchPatients();
+            } catch (err) {
+                console.error(err);
+                approveBtn.disabled = false;
+                approveBtn.innerHTML = '<i class="fas fa-check mr-1"></i>Approve';
+            }
+        }
+
+        async function handleComplete(patient) {
+            if (!confirm("Selesaikan konsultasi ini?")) return;
+
+            try {
+                const res = await fetch(`/consultations/${patient.id}/complete`, {
+                    method: "POST",
+                    headers: {
+                        "Accept": "application/json",
+                        "X-CSRF-TOKEN": CSRF_TOKEN,
+                    }
+                });
+
+                if (!res.ok) throw new Error("Gagal menyelesaikan konsultasi");
+                await fetchPatients();
+                alert("Konsultasi selesai");
+            } catch (err) {
+                console.error(err);
+                alert("Terjadi kesalahan");
+            }
+        }
+
         function selectApprovedPatient(patient) {
             document.getElementById('current-patient-avatar').src = patient.patient_avatar ?? '/img/default-user.jpg';
             document.getElementById('current-patient-name').textContent = patient.patient_name;
@@ -744,55 +978,11 @@
             document.getElementById('message-input').disabled = false;
             document.getElementById('send-button').disabled = false;
             document.getElementById('chat-messages').innerHTML = '';
+
+            currentConsultationId = patient.id;
+            loadChatMessages(patient.id);
         }
 
-        // ====== RENDER HISTORY (STYLE UPDATE) ======
-        function renderHistoryPatients(patients) {
-            const container = document.getElementById('history-patients-list');
-            container.innerHTML = '';
-
-            if (patients.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center py-8">
-                        <i class="fas fa-clipboard-check text-3xl text-gray-300 mb-2"></i>
-                        <p class="text-sm text-gray-500">Belum ada riwayat</p>
-                    </div>
-                `;
-                return;
-            }
-
-            patients.forEach(p => {
-                const card = document.createElement('div');
-                card.className =
-                    'consultation-card p-4 bg-gray-50 rounded-xl shadow-sm border border-gray-200 hover:bg-gray-100';
-                card.dataset.id = p.id;
-
-                card.innerHTML = `
-                    <div class="flex items-start space-x-3 mb-2">
-                        <img src="${p.patient_avatar || '/img/default-user.jpg'}" 
-                             alt="${escapeHtml(p.patient_name)}"
-                             class="patient-avatar w-10 h-10 rounded-full object-cover ring-2 ring-gray-200">
-                        <div class="flex-1 min-w-0">
-                            <div class="font-semibold text-dark text-sm truncate">${escapeHtml(p.patient_name)}</div>
-                            <div class="text-xs text-gray-500">Selesai: ${escapeHtml(p.completed_at || '')}</div>
-                        </div>
-                    </div>
-                    <div class="mt-2">
-                        <span class="status-badge status-complete">
-                            <i class="fas fa-check-double mr-1 text-xs"></i>Selesai
-                        </span>
-                    </div>
-                `;
-
-                card.addEventListener('click', async () => {
-                    await openHistoryChat(p);
-                });
-
-                container.appendChild(card);
-            });
-        }
-
-        // ====== OPEN HISTORY CHAT (TIDAK DIUBAH) ======
         async function openHistoryChat(patient) {
             currentConsultationId = patient.id;
             document.getElementById('current-patient-avatar').src = patient.patient_avatar ?? '/img/default-user.jpg';
@@ -806,7 +996,7 @@
             await loadChatMessages(patient.id);
         }
 
-        // ====== LOAD CHAT MESSAGES (TIDAK DIUBAH) ======
+        // ====== CHAT FUNCTIONS ======
         async function loadChatMessages(consultationId) {
             try {
                 const res = await fetch(`/consultations/${consultationId}/chats`, {
@@ -831,14 +1021,56 @@
                         minute: '2-digit'
                     });
 
-                    wrapper.innerHTML = `
-                        <div class="max-w-xs md:max-w-md lg:max-w-lg">
-                            <div class="${bubbleClass} px-4 py-3">
-                                <p class="text-sm md:text-base leading-relaxed">${escapeHtml(chat.message || '[Attachment]')}</p>
+                    let messageContent = '';
+
+                    if (chat.attachment_path) {
+                        const attachmentType = chat.type;
+
+                        if (attachmentType === 'image') {
+                            messageContent = `
+                            <div class="mb-2">
+                                <img src="/storage/${chat.attachment_path}" 
+                                     alt="Gambar" 
+                                     class="max-w-xs rounded-lg cursor-pointer hover:opacity-90 transition border border-gray-200"
+                                     onclick="openImageModal('/storage/${chat.attachment_path}')">
                             </div>
-                            <div class="text-xs text-gray-500 mt-1 px-1 ${isDoctor ? 'text-right' : 'text-left'}">${escapeHtml(time)}</div>
+                            ${chat.message && chat.message !== '[Mengirim gambar]' ? 
+                              `<div class="text-sm mt-2">${escapeHtml(chat.message)}</div>` : ''}
+                        `;
+                        } else {
+                            const fileName = chat.attachment_path.split('/').pop() || 'File';
+                            messageContent = `
+                            <div class="flex items-center space-x-3 bg-white p-3 rounded-lg border border-gray-200 mb-2">
+                                <i class="fas fa-file text-primary text-xl"></i>
+                                <div class="flex-1">
+                                    <div class="font-medium text-sm">${escapeHtml(fileName)}</div>
+                                    <div class="text-xs text-gray-500">File</div>
+                                </div>
+                                <a href="/storage/${chat.attachment_path}" 
+                                   download="${fileName}"
+                                   class="text-primary hover:text-secondary transition">
+                                    <i class="fas fa-download"></i>
+                                </a>
+                            </div>
+                            ${chat.message && chat.message !== '[Mengirim file]' ? 
+                              `<div class="text-sm mt-2">${escapeHtml(chat.message)}</div>` : ''}
+                        `;
+                        }
+                    } else {
+                        messageContent =
+                            `<p class="text-sm md:text-base leading-relaxed">${escapeHtml(chat.message || '[Attachment]')}</p>`;
+                    }
+
+                    wrapper.innerHTML = `
+                    <div class="max-w-xs md:max-w-md lg:max-w-lg">
+                        <div class="${bubbleClass} px-4 py-3">
+                            ${messageContent}
                         </div>
-                    `;
+                        <div class="text-xs text-gray-500 mt-1 px-1 ${isDoctor ? 'text-right' : 'text-left'}">
+                            ${escapeHtml(time)}
+                        </div>
+                    </div>
+                `;
                     container.appendChild(wrapper);
                 });
 
@@ -848,11 +1080,11 @@
             }
         }
 
-        // ====== SEND MESSAGE (TIDAK DIUBAH) ======
         async function sendMessage() {
             const input = document.getElementById('message-input');
             const text = input.value.trim();
-            if (!text) return;
+
+            if (!currentFile && !text) return;
             if (!currentConsultationId) {
                 alert('Pilih pasien yang sudah di-approve terlebih dahulu.');
                 return;
@@ -861,18 +1093,30 @@
             document.getElementById('send-button').disabled = true;
 
             try {
+                const formData = new FormData();
+                formData.append('consultation_id', currentConsultationId);
+
+                if (currentFile) {
+                    if (text) {
+                        formData.append('message', text);
+                    } else {
+                        formData.append('message', currentFileType === 'image' ? '[Mengirim gambar]' :
+                            '[Mengirim file]');
+                    }
+                    formData.append('attachment', currentFile);
+                    formData.append('type', currentFileType);
+                } else {
+                    formData.append('message', text);
+                    formData.append('type', 'text');
+                }
+
                 const res = await fetch('/chats', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': CSRF_TOKEN,
                         'Accept': 'application/json'
                     },
-                    body: JSON.stringify({
-                        consultation_id: currentConsultationId,
-                        message: text,
-                        type: 'text'
-                    })
+                    body: formData
                 });
 
                 if (!res.ok) {
@@ -883,6 +1127,7 @@
                 }
 
                 input.value = '';
+                clearFile();
                 await loadChatMessages(currentConsultationId);
 
             } catch (err) {
@@ -893,15 +1138,7 @@
             }
         }
 
-        // ====== REJECT FLOW (TIDAK DIUBAH) ======
-        const modal = document.getElementById('consultation-modal');
-        const textarea = document.getElementById('consultation-reason');
-        const cancelBtn = document.getElementById('cancel-consultation');
-        const submitBtn = document.getElementById('submit-consultation');
-        const closeBtn = document.getElementById('close-reject-modal');
-        let rejectPatient = null;
-        let rejectCard = null;
-
+        // ====== REJECT MODAL FUNCTIONS ======
         function openRejectModal(patient, card) {
             rejectPatient = patient;
             rejectCard = card;
@@ -909,17 +1146,16 @@
             modal.classList.remove('hidden');
         }
 
-        cancelBtn.addEventListener('click', () => modal.classList.add('hidden'));
-        closeBtn.addEventListener('click', () => modal.classList.add('hidden'));
-
-        submitBtn.addEventListener('click', async () => {
+        async function handleReject() {
             if (!textarea.value.trim()) {
                 alert('Isi alasan penolakan!');
                 return;
             }
+
             try {
                 submitBtn.disabled = true;
                 submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i>Menolak...';
+
                 const res = await fetch(`/consultations/${rejectPatient.id}/reject`, {
                     method: 'POST',
                     headers: {
@@ -942,17 +1178,38 @@
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = 'Tolak Request';
             }
-        });
+        }
 
-        // ====== EVENT BINDINGS (TIDAK DIUBAH) ======
-        document.getElementById('send-button').addEventListener('click', sendMessage);
-        document.getElementById('message-input').addEventListener('keypress', e => {
-            if (e.key === 'Enter') sendMessage();
-        });
+        // ====== SUGGESTED MESSAGES ======
+        const suggestedMessages = [
+            "Silakan lanjutkan diet sesuai rencana",
+            "Perlu evaluasi lebih lanjut pada pencernaan Anda",
+            "Berat badan Anda sudah menunjukkan perkembangan positif",
+            "Disarankan olahraga ringan 30 menit setiap hari",
+            "Mohon catat gejala yang muncul dalam 1 minggu ke depan",
+            "Silakan lihat gambar panduan diet yang saya kirim",
+            "File panduan olahraga sudah saya lampirkan"
+        ];
 
-        // ====== REFRESH (TIDAK DIUBAH) ======
-        let lastLoadedCount = 0;
+        function renderSuggestedMessages() {
+            const container = document.getElementById('suggested-messages');
+            container.innerHTML = '';
 
+            suggestedMessages.forEach(msg => {
+                const btn = document.createElement('button');
+                btn.className =
+                'px-3 py-1 bg-primary text-white text-sm rounded-full hover:bg-secondary transition';
+                btn.textContent = msg;
+                btn.addEventListener('click', () => {
+                    const input = document.getElementById('message-input');
+                    input.value = msg;
+                    input.focus();
+                });
+                container.appendChild(btn);
+            });
+        }
+
+        // ====== AUTO REFRESH ======
         setInterval(() => {
             if (!currentConsultationId) return;
 
@@ -967,35 +1224,26 @@
                 .catch(err => console.error(err));
         }, 2000);
 
-        const suggestedMessages = [
-            "Silakan lanjutkan diet sesuai rencana",
-            "Perlu evaluasi lebih lanjut pada pencernaan Anda",
-            "Berat badan Anda sudah menunjukkan perkembangan positif",
-            "Disarankan olahraga ringan 30 menit setiap hari",
-            "Mohon catat gejala yang muncul dalam 1 minggu ke depan"
-        ];
+        // ====== EVENT LISTENERS ======
+        document.getElementById('send-button').addEventListener('click', sendMessage);
+        document.getElementById('message-input').addEventListener('keypress', e => {
+            if (e.key === 'Enter') sendMessage();
+        });
 
-        function renderSuggestedMessages() {
-            const container = document.getElementById('suggested-messages');
-            container.innerHTML = '';
-            suggestedMessages.forEach(msg => {
-                const btn = document.createElement('button');
-                btn.className =
-                    'px-3 py-1 bg-primary text-white text-sm rounded-full hover:bg-secondary transition';
-                btn.textContent = msg;
-                btn.addEventListener('click', () => {
-                    const input = document.getElementById('message-input');
-                    input.value = msg;
-                    input.focus();
-                });
-                container.appendChild(btn);
-            });
-        }
+        document.getElementById('attachment-button').addEventListener('click', () => {
+            document.getElementById('file-input').click();
+        });
 
-        // Jalankan setelah halaman siap
+        document.getElementById('file-input').addEventListener('change', handleFileSelect);
+        document.getElementById('remove-file').addEventListener('click', clearFile);
+        document.getElementById('remove-image').addEventListener('click', clearFile);
+
+        cancelBtn.addEventListener('click', () => modal.classList.add('hidden'));
+        closeBtn.addEventListener('click', () => modal.classList.add('hidden'));
+        submitBtn.addEventListener('click', handleReject);
+
+        // ====== INITIALIZATION ======
         renderSuggestedMessages();
-
-        // ====== INIT (TIDAK DIUBAH) ======
         fetchPatients();
     </script>
 </body>

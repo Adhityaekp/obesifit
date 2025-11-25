@@ -366,10 +366,11 @@
                                 $recentPatients = Auth::user()->patients()->latest()->take(5)->get();
                             @endphp
 
-                            <div class="grid grid-cols-2 gap-3 mb-6">
-                                <div class="stat-card p-4 rounded-xl text-center">
-                                    <div class="text-2xl font-bold">{{ $activeConsultations }}</div>
-                                    <div class="text-xs opacity-90">Aktif</div>
+                            <!-- Baris Status -->
+                            <div class="grid grid-cols-2 gap-3 mb-4">
+                                <div class="p-4 bg-green-100 rounded-xl text-center">
+                                    <div class="text-2xl font-bold text-green-700">{{ $activeConsultations }}</div>
+                                    <div class="text-xs text-green-600">Aktif</div>
                                 </div>
                                 <div class="p-4 bg-yellow-100 rounded-xl text-center">
                                     <div class="text-2xl font-bold text-yellow-700">{{ $pendingConsultations }}</div>
@@ -379,10 +380,16 @@
                                     <div class="text-2xl font-bold text-blue-700">{{ $completedConsultations }}</div>
                                     <div class="text-xs text-blue-600">Selesai</div>
                                 </div>
-                                <div class="p-4 bg-gray-100 rounded-xl text-center">
-                                    <div class="text-2xl font-bold text-gray-700">{{ $totalConsultations }}</div>
-                                    <div class="text-xs text-gray-600">Total</div>
+                                <div class="p-4 bg-red-100 rounded-xl text-center">
+                                    <div class="text-2xl font-bold text-red-700">{{ $ejectedConsultations }}</div>
+                                    <div class="text-xs text-red-600">Ditolak</div>
                                 </div>
+                            </div>
+
+                            <!-- Baris Total -->
+                            <div class="p-4 bg-gray-100 rounded-xl text-center">
+                                <div class="text-2xl font-bold text-gray-700">{{ $totalConsultations }}</div>
+                                <div class="text-xs text-gray-600">Total</div>
                             </div>
 
                             <h4 class="font-semibold text-dark mb-3 text-sm">Pasien Terbaru</h4>

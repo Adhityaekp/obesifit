@@ -1,5 +1,5 @@
 <style>
-    /* Navbar Animations */
+    /* Navbar Animations - Admin */
     .navbar-shadow {
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
         transition: box-shadow 0.3s ease;
@@ -19,7 +19,6 @@
             opacity: 0;
             transform: translateY(-10px);
         }
-
         to {
             opacity: 1;
             transform: translateY(0);
@@ -36,14 +35,13 @@
             opacity: 0;
             transform: translateY(-10px);
         }
-
         to {
             opacity: 1;
             transform: translateY(0);
         }
     }
 
-    /* Logo Pulse */
+    /* Logo Pulse - Admin */
     .logo-icon {
         transition: transform 0.3s ease;
     }
@@ -52,25 +50,34 @@
         transform: scale(1.1) rotate(5deg);
     }
 
-    /* Nav Links Hover Effect */
+    /* Nav Links Hover Effect - Admin */
     .nav-link {
         position: relative;
-        transition: color 0.3s ease;
+        transition: all 0.3s ease;
+        padding: 8px 12px;
+        border-radius: 6px;
+    }
+
+    .nav-link:hover {
+        color: #4EAC92;
+        background-color: rgba(78, 172, 146, 0.08);
+        transform: translateY(-1px);
     }
 
     .nav-link::after {
         content: '';
         position: absolute;
-        bottom: -4px;
-        left: 0;
+        bottom: -2px;
+        left: 50%;
         width: 0;
         height: 2px;
         background: #4EAC92;
-        transition: width 0.3s ease;
+        transition: all 0.3s ease;
+        transform: translateX(-50%);
     }
 
     .nav-link:hover::after {
-        width: 100%;
+        width: 80%;
     }
 
     /* Notification Badge Pulse */
@@ -79,18 +86,15 @@
     }
 
     @keyframes badgePulse {
-
-        0%,
-        100% {
+        0%, 100% {
             transform: scale(1);
         }
-
         50% {
             transform: scale(1.1);
         }
     }
 
-    /* Profile Avatar Border Animation */
+    /* Profile Avatar Border Animation - Admin */
     .profile-avatar {
         transition: all 0.3s ease;
     }
@@ -103,10 +107,13 @@
     /* Notification Item Hover */
     .notif-item {
         transition: all 0.2s ease;
+        border-radius: 8px;
+        margin: 2px 4px;
     }
 
     .notif-item:hover {
         transform: translateX(4px);
+        background-color: rgba(78, 172, 146, 0.05) !important;
     }
 
     /* Mobile Menu Toggle Icon Animation */
@@ -151,7 +158,6 @@
         from {
             opacity: 0;
         }
-
         to {
             opacity: 1;
         }
@@ -167,14 +173,13 @@
             transform: translateY(20px);
             opacity: 0;
         }
-
         to {
             transform: translateY(0);
             opacity: 1;
         }
     }
 
-    /* Button Hover Effects */
+    /* Button Hover Effects - Admin */
     .btn-mark-read {
         transition: all 0.3s ease;
     }
@@ -182,6 +187,7 @@
     .btn-mark-read:hover {
         transform: translateY(-2px);
         box-shadow: 0 4px 12px rgba(78, 172, 146, 0.2);
+        background-color: rgba(255, 255, 255, 0.3) !important;
     }
 
     /* Unread Notification Indicator */
@@ -190,24 +196,110 @@
     }
 
     @keyframes dotPulse {
-
-        0%,
-        100% {
+        0%, 100% {
             opacity: 1;
             transform: scale(1);
         }
-
         50% {
             opacity: 0.7;
             transform: scale(1.2);
         }
     }
 
-    /* Mobile User Card */
+    /* Mobile User Card - Admin */
     .mobile-user-card {
         background: linear-gradient(135deg, #f9fafb 0%, #ffffff 100%);
         border-radius: 12px;
         padding: 16px;
+        border: 1px solid rgba(78, 172, 146, 0.1);
+    }
+
+    /* Admin Badge Styling */
+    .admin-badge {
+        background: linear-gradient(135deg, #4EAC92, #3A8C74);
+        color: white;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        margin-left: 8px;
+    }
+
+    /* Icon Hover Effects - Admin */
+    .nav-icon {
+        transition: all 0.3s ease;
+    }
+
+    .nav-icon:hover {
+        color: #4EAC92;
+        transform: scale(1.1);
+    }
+
+    /* Dropdown Menu Items Hover - Admin */
+    #dropdown-menu a,
+    #dropdown-menu button {
+        transition: all 0.2s ease;
+        border-radius: 6px;
+        margin: 2px 8px;
+    }
+
+    #dropdown-menu a:hover,
+    #dropdown-menu button:hover {
+        background-color: rgba(78, 172, 146, 0.08);
+        transform: translateX(4px);
+    }
+
+    /* Mobile Menu Items Hover - Admin */
+    #mobile-menu a,
+    #mobile-menu button {
+        transition: all 0.2s ease;
+        border-radius: 8px;
+    }
+
+    #mobile-menu a:hover,
+    #mobile-menu button:hover {
+        background-color: rgba(78, 172, 146, 0.08);
+        transform: translateX(4px);
+    }
+
+    /* Notification Toggle Hover */
+    #notif-toggle {
+        transition: all 0.3s ease;
+        border-radius: 50%;
+    }
+
+    #notif-toggle:hover {
+        background-color: rgba(78, 172, 146, 0.1);
+        transform: scale(1.05);
+    }
+
+    /* Dropdown Toggle Hover - Admin */
+    #dropdown-toggle {
+        transition: all 0.3s ease;
+        border-radius: 8px;
+    }
+
+    #dropdown-toggle:hover {
+        background-color: rgba(78, 172, 146, 0.08);
+    }
+
+    /* Mobile Menu Button Hover */
+    #mobile-menu-button {
+        transition: all 0.3s ease;
+        border-radius: 8px;
+    }
+
+    #mobile-menu-button:hover {
+        background-color: rgba(78, 172, 146, 0.1);
+        transform: scale(1.05);
+    }
+
+    /* Gradient Text Effect for Admin */
+    .admin-gradient {
+        background: linear-gradient(135deg, #4EAC92, #3A8C74);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
     }
 
     /* Responsive Text Sizing */
@@ -215,6 +307,32 @@
         .text-responsive {
             font-size: 0.875rem;
         }
+        
+        .nav-link {
+            padding: 12px 16px;
+            margin: 2px 0;
+        }
+    }
+
+    /* Smooth transitions for all interactive elements */
+    button, a, .nav-link, .profile-avatar, .logo-icon {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Focus states for accessibility */
+    button:focus-visible,
+    a:focus-visible,
+    .nav-link:focus-visible {
+        outline: 2px solid #4EAC92;
+        outline-offset: 2px;
+        border-radius: 4px;
+    }
+
+    /* Active state for mobile menu */
+    #mobile-menu a:active,
+    #mobile-menu button:active {
+        transform: scale(0.98);
+        background-color: rgba(78, 172, 146, 0.15);
     }
 </style>
 

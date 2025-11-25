@@ -27,6 +27,11 @@ class Article extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
     // Akses URL gambar artikel
     public function getImageUrlAttribute()
     {

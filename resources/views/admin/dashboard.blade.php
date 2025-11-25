@@ -60,46 +60,12 @@
 
 <body class="font-poppins bg-light">
     <!-- Navbar Admin -->
-    <nav class="bg-white shadow-sm fixed w-full top-0 z-50">
-        <div class="container mx-auto px-4">
-            <div class="flex items-center justify-between h-16">
-                <div class="flex items-center">
-                    <a href="/admin" class="flex items-center">
-                        <div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center mr-2">
-                            <i class="fas fa-heartbeat text-white"></i>
-                        </div>
-                        <span class="text-xl font-bold text-dark">OBESIFIT <span
-                                class="text-sm bg-primary text-white px-2 py-1 rounded ml-2">Admin</span></span>
-                    </a>
-                </div>
-
-                <div class="hidden md:flex items-center space-x-8">
-                    <a href="/admin" class="text-dark hover:text-primary transition">Dashboard</a>
-                    <a href="/admin/users" class="text-dark hover:text-primary transition">Manajemen User</a>
-                    <a href="/admin/content" class="text-dark hover:text-primary transition">Konten</a>
-                    <a href="/admin/analytics" class="text-dark hover:text-primary transition">Analitik</a>
-                </div>
-
-                <div class="flex items-center space-x-4">
-                    <a href="/admin/notifications" class="text-dark hover:text-primary transition relative">
-                        <i class="fas fa-bell"></i>
-                        <span
-                            class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">3</span>
-                    </a>
-                    <div class="flex items-center space-x-2 text-dark">
-                        <div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-                            <i class="fas fa-user-shield text-white text-sm"></i>
-                        </div>
-                        <span>Admin</span>
-                        <i class="fas fa-chevron-down text-sm"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </nav>
+    @auth
+        @include('components.admin-navbar')
+    @endauth
 
     <!-- Main Content -->
-    <div class="pt-20 pb-8">
+    <div class="pt-10 pb-8">
         <div class="container mx-auto px-4">
             <!-- Header -->
             <div class="mb-8">
@@ -109,159 +75,128 @@
 
             <!-- Stats Overview -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+
+                <!-- Pengguna Dokter -->
                 <div class="admin-card stat-card rounded-2xl p-6">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-green-100">Total Pengguna</p>
-                            <h3 class="text-3xl font-bold mt-2">2,847</h3>
+                            <p class="text-green-100">Pengguna Dokter</p>
+                            <h3 class="text-3xl font-bold mt-2">{{ $doctorCount }}</h3>
                             <p class="text-green-100 text-sm mt-1">
-                                <i class="fas fa-arrow-up mr-1"></i>12% dari bulan lalu
+                                <i class="fas fa-arrow-up mr-1"></i>Aktif terdaftar
                             </p>
                         </div>
                         <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                            <i class="fas fa-users text-white text-xl"></i>
+                            <i class="fas fa-user-md text-white text-xl"></i>
                         </div>
                     </div>
                 </div>
 
+                <!-- Pengguna User -->
                 <div class="admin-card stat-card rounded-2xl p-6">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-green-100">Konten Aktif</p>
-                            <h3 class="text-3xl font-bold mt-2">156</h3>
+                            <p class="text-green-100">Pengguna User</p>
+                            <h3 class="text-3xl font-bold mt-2">{{ $userCount }}</h3>
                             <p class="text-green-100 text-sm mt-1">
-                                <i class="fas fa-plus mr-1"></i>5 baru minggu ini
+                                <i class="fas fa-users mr-1"></i>Aktif terdaftar
                             </p>
                         </div>
                         <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                            <i class="fas fa-file-alt text-white text-xl"></i>
+                            <i class="fas fa-user text-white text-xl"></i>
                         </div>
                     </div>
                 </div>
 
+                <!-- Konten Artikel -->
                 <div class="admin-card stat-card rounded-2xl p-6">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-green-100">Konsultasi</p>
-                            <h3 class="text-3xl font-bold mt-2">42</h3>
+                            <p class="text-green-100">Konten Artikel</p>
+                            <h3 class="text-3xl font-bold mt-2">{{ $articleCount }}</h3>
                             <p class="text-green-100 text-sm mt-1">
-                                <i class="fas fa-clock mr-1"></i>8 menunggu respon
+                                <i class="fas fa-file-alt mr-1"></i>Total artikel
                             </p>
                         </div>
                         <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                            <i class="fas fa-comments text-white text-xl"></i>
+                            <i class="fas fa-newspaper text-white text-xl"></i>
                         </div>
                     </div>
                 </div>
 
+                <!-- Konten Video -->
                 <div class="admin-card stat-card rounded-2xl p-6">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-green-100">Aktivitas</p>
-                            <h3 class="text-3xl font-bold mt-2">1,284</h3>
+                            <p class="text-green-100">Konten Video</p>
+                            <h3 class="text-3xl font-bold mt-2">{{ $videoCount }}</h3>
                             <p class="text-green-100 text-sm mt-1">
-                                <i class="fas fa-chart-line mr-1"></i>Aktif hari ini
+                                <i class="fas fa-play mr-1"></i>Total video
                             </p>
                         </div>
                         <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                            <i class="fas fa-chart-bar text-white text-xl"></i>
+                            <i class="fas fa-video text-white text-xl"></i>
                         </div>
                     </div>
                 </div>
+
             </div>
+
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <!-- Sidebar Menu -->
                 <div class="lg:col-span-1">
                     <!-- Quick Actions -->
-                    <div class="admin-card bg-white rounded-2xl shadow-sm p-6 mb-6">
-                        <h3 class="text-lg font-bold text-dark mb-4">Aksi Cepat</h3>
-                        <div class="space-y-3">
-                            <button
-                                class="w-full flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-green-50 transition">
-                                <div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
-                                    <i class="fas fa-plus text-white"></i>
-                                </div>
-                                <span class="font-medium text-dark">Tambah Konten Baru</span>
-                            </button>
-
-                            <button
-                                class="w-full flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-green-50 transition">
-                                <div class="w-10 h-10 bg-secondary rounded-full flex items-center justify-center">
-                                    <i class="fas fa-user-plus text-white"></i>
-                                </div>
-                                <span class="font-medium text-dark">Kelola Pengguna</span>
-                            </button>
-
-                            <button
-                                class="w-full flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-green-50 transition">
-                                <div class="w-10 h-10 bg-accent rounded-full flex items-center justify-center">
-                                    <i class="fas fa-chart-pie text-white"></i>
-                                </div>
-                                <span class="font-medium text-dark">Lihat Laporan</span>
-                            </button>
-
-                            <button
-                                class="w-full flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-green-50 transition">
-                                <div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
-                                    <i class="fas fa-cog text-white"></i>
-                                </div>
-                                <span class="font-medium text-dark">Pengaturan Sistem</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Recent Activity -->
                     <div class="admin-card bg-white rounded-2xl shadow-sm p-6">
-                        <h3 class="text-lg font-bold text-dark mb-4">Aktivitas Terbaru</h3>
+                        <h3 class="text-lg font-bold text-dark mb-4">Dokter Menunggu Verifikasi</h3>
+
                         <div class="space-y-4">
-                            <div class="flex items-start space-x-3">
-                                <div
-                                    class="w-8 h-8 bg-primary bg-opacity-10 rounded-full flex items-center justify-center mt-1">
-                                    <i class="fas fa-user-plus text-primary text-sm"></i>
-                                </div>
-                                <div>
-                                    <p class="font-medium text-dark">User baru terdaftar</p>
-                                    <p class="text-sm text-gray-600">Budi Santoso bergabung</p>
-                                    <p class="text-xs text-gray-500">10 menit lalu</p>
-                                </div>
-                            </div>
+                            @forelse($pendingDoctors as $doctor)
+                                <div class="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
+                                    <div
+                                        class="w-8 h-8 bg-primary bg-opacity-10 rounded-full flex items-center justify-center mt-1 flex-shrink-0">
+                                        <i class="fas fa-user-md text-primary text-sm"></i>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="font-medium text-dark">{{ $doctor->first_name }}
+                                            {{ $doctor->last_name }}</p>
+                                        <p class="text-sm text-gray-600">
+                                            {{ $doctor->specialization ?? 'Spesialisasi belum diisi' }}
+                                        </p>
+                                        <p class="text-xs text-gray-500">{{ $doctor->created_at->diffForHumans() }}</p>
 
-                            <div class="flex items-start space-x-3">
-                                <div
-                                    class="w-8 h-8 bg-secondary bg-opacity-10 rounded-full flex items-center justify-center mt-1">
-                                    <i class="fas fa-file-alt text-secondary text-sm"></i>
-                                </div>
-                                <div>
-                                    <p class="font-medium text-dark">Konten baru dipublikasi</p>
-                                    <p class="text-sm text-gray-600">Artikel "Diet Sehat"</p>
-                                    <p class="text-xs text-gray-500">1 jam lalu</p>
-                                </div>
-                            </div>
+                                        <!-- Tombol Aksi -->
+                                        <div class="flex space-x-2 mt-2">
+                                            <!-- Tombol Verifikasi -->
+                                            <form action="{{ route('admin.verify-doctor', $doctor->id) }}"
+                                                method="POST">
+                                                @csrf
+                                                <button type="submit"
+                                                    class="bg-primary hover:bg-secondary text-white px-3 py-1 rounded-lg text-xs font-medium transition duration-300 flex items-center">
+                                                    <i class="fas fa-check mr-1"></i>
+                                                    Verifikasi
+                                                </button>
+                                            </form>
 
-                            <div class="flex items-start space-x-3">
-                                <div
-                                    class="w-8 h-8 bg-accent bg-opacity-10 rounded-full flex items-center justify-center mt-1">
-                                    <i class="fas fa-comment text-accent text-sm"></i>
+                                            <!-- Tombol Tolak -->
+                                            <form action="{{ route('admin.reject-doctor', $doctor->id) }}"
+                                                method="POST"
+                                                onsubmit="return confirmReject('{{ $doctor->first_name }} {{ $doctor->last_name }}')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit"
+                                                    class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg text-xs font-medium transition duration-300 flex items-center">
+                                                    <i class="fas fa-times mr-1"></i>
+                                                    Tolak
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div>
-                                    <p class="font-medium text-dark">Konsultasi baru</p>
-                                    <p class="text-sm text-gray-600">Pertanyaan dari Siti</p>
-                                    <p class="text-xs text-gray-500">2 jam lalu</p>
-                                </div>
-                            </div>
-
-                            <div class="flex items-start space-x-3">
-                                <div
-                                    class="w-8 h-8 bg-primary bg-opacity-10 rounded-full flex items-center justify-center mt-1">
-                                    <i class="fas fa-chart-line text-primary text-sm"></i>
-                                </div>
-                                <div>
-                                    <p class="font-medium text-dark">Laporan bulanan dibuat</p>
-                                    <p class="text-sm text-gray-600">Analitik Oktober 2023</p>
-                                    <p class="text-xs text-gray-500">Hari ini</p>
-                                </div>
-                            </div>
+                            @empty
+                                <p class="text-sm text-gray-500 text-center py-4">Tidak ada dokter yang menunggu
+                                    verifikasi.</p>
+                            @endforelse
                         </div>
                     </div>
                 </div>
@@ -279,12 +214,12 @@
                             <button
                                 class="tab-button flex-1 py-4 px-6 font-semibold text-gray-600 transition-all hover:text-gray-800"
                                 data-tab="content">
-                                <i class="fas fa-file-alt mr-2"></i>Manajemen Konten
+                                <i class="fas fa-file-alt mr-2"></i>Manajemen Konten Artikel
                             </button>
                             <button
                                 class="tab-button flex-1 py-4 px-6 font-semibold text-gray-600 rounded-tr-2xl transition-all hover:text-gray-800"
-                                data-tab="analytics">
-                                <i class="fas fa-chart-bar mr-2"></i>Analitik
+                                data-tab="video">
+                                <i class="fas fa-play mr-2"></i>Manajemen Konten Video
                             </button>
                         </div>
 
@@ -293,15 +228,30 @@
                             <div class="flex justify-between items-center mb-6">
                                 <h3 class="text-lg font-semibold text-dark">Daftar Pengguna</h3>
                                 <div class="flex space-x-3">
+                                    <!-- ✅ Search -->
                                     <div class="relative">
-                                        <input type="text" placeholder="Cari pengguna..."
-                                            class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
-                                        <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                                        <form method="GET">
+                                            <input type="hidden" name="tab" value="users">
+                                            <input type="text" name="search" value="{{ request('search') }}"
+                                                placeholder="Cari pengguna..."
+                                                class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                                            <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                                        </form>
                                     </div>
-                                    <button
-                                        class="px-4 py-2 bg-primary text-white rounded-lg font-semibold hover:bg-secondary transition">
-                                        <i class="fas fa-plus mr-2"></i>Tambah User
-                                    </button>
+
+                                    <!-- ✅ Filter Role -->
+                                    <form method="GET">
+                                        <input type="hidden" name="tab" value="content">
+                                        <select name="role" onchange="this.form.submit()"
+                                            class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary">
+                                            <option value="">Semua Role</option>
+                                            <option value="user" {{ request('role') == 'user' ? 'selected' : '' }}>
+                                                User</option>
+                                            <option value="doctor"
+                                                {{ request('role') == 'doctor' ? 'selected' : '' }}>
+                                                Doctor</option>
+                                        </select>
+                                    </form>
                                 </div>
                             </div>
 
@@ -314,339 +264,384 @@
                                             </th>
                                             <th class="py-3 px-4 text-left text-sm font-medium text-gray-700">Bergabung
                                             </th>
-                                            <th class="py-3 px-4 text-left text-sm font-medium text-gray-700">Aktivitas
+                                            <th class="py-3 px-4 text-left text-sm font-medium text-gray-700">Role
                                             </th>
                                             <th class="py-3 px-4 text-left text-sm font-medium text-gray-700">Aksi</th>
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y divide-gray-200">
-                                        <tr class="table-row-hover">
-                                            <td class="py-3 px-4">
-                                                <div class="flex items-center space-x-3">
-                                                    <div
-                                                        class="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-                                                        <i class="fas fa-user text-white text-sm"></i>
+                                        @foreach ($users as $user)
+                                            <tr class="table-row-hover">
+                                                <td class="py-3 px-4">
+                                                    <div class="flex items-center space-x-3">
+                                                        <div
+                                                            class="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+                                                            <i class="fas fa-user text-white text-sm"></i>
+                                                        </div>
+                                                        <div>
+                                                            <div class="font-medium text-dark">{{ $user->first_name }}
+                                                                {{ $user->last_name }}</div>
+                                                            <div class="text-sm text-gray-600">{{ $user->email }}
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                    <div>
-                                                        <div class="font-medium text-dark">Ahmad Budiman</div>
-                                                        <div class="text-sm text-gray-600">ahmad@email.com</div>
+                                                </td>
+
+                                                <!-- Status -->
+                                                <td class="py-3 px-4">
+                                                    @if ($user->is_active)
+                                                        <span
+                                                            class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Aktif</span>
+                                                    @else
+                                                        <span
+                                                            class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">Pending</span>
+                                                    @endif
+                                                </td>
+
+                                                <!-- Tanggal Bergabung -->
+                                                <td class="py-3 px-4 text-sm text-gray-600">
+                                                    {{ $user->created_at->format('d M Y') }}
+                                                </td>
+
+                                                <!-- Role -->
+                                                <td class="py-3 px-4">
+                                                    <div class="text-sm text-gray-600 capitalize">{{ $user->role }}
                                                     </div>
-                                                </div>
-                                            </td>
-                                            <td class="py-3 px-4">
-                                                <span
-                                                    class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Aktif</span>
-                                            </td>
-                                            <td class="py-3 px-4 text-sm text-gray-600">15 Okt 2023</td>
-                                            <td class="py-3 px-4">
-                                                <div class="text-sm text-gray-600">12 artikel dibaca</div>
-                                            </td>
-                                            <td class="py-3 px-4">
-                                                <div class="flex space-x-2">
-                                                    <button class="text-primary hover:text-secondary">
-                                                        <i class="fas fa-edit"></i>
-                                                    </button>
-                                                    <button class="text-red-500 hover:text-red-700">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr class="table-row-hover">
-                                            <td class="py-3 px-4">
-                                                <div class="flex items-center space-x-3">
-                                                    <div
-                                                        class="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-                                                        <i class="fas fa-user text-white text-sm"></i>
+                                                </td>
+
+                                                <!-- Aksi -->
+                                                <td class="py-3 px-4">
+                                                    <div class="flex space-x-2">
+                                                        <button onclick="openEditModal({{ $user->id }})"
+                                                            class="text-primary hover:text-secondary transition"
+                                                            title="Edit User">
+                                                            <i class="fas fa-edit"></i>
+                                                        </button>
+                                                        <button
+                                                            onclick="openDeleteModal({{ $user->id }}, '{{ $user->first_name }} {{ $user->last_name }}')"
+                                                            class="text-red-500 hover:text-red-700 transition"
+                                                            title="Hapus User">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
                                                     </div>
-                                                    <div>
-                                                        <div class="font-medium text-dark">Siti Rahayu</div>
-                                                        <div class="text-sm text-gray-600">siti@email.com</div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td class="py-3 px-4">
-                                                <span
-                                                    class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">Pending</span>
-                                            </td>
-                                            <td class="py-3 px-4 text-sm text-gray-600">20 Okt 2023</td>
-                                            <td class="py-3 px-4">
-                                                <div class="text-sm text-gray-600">8 video ditonton</div>
-                                            </td>
-                                            <td class="py-3 px-4">
-                                                <div class="flex space-x-2">
-                                                    <button class="text-primary hover:text-secondary">
-                                                        <i class="fas fa-edit"></i>
-                                                    </button>
-                                                    <button class="text-red-500 hover:text-red-700">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr class="table-row-hover">
-                                            <td class="py-3 px-4">
-                                                <div class="flex items-center space-x-3">
-                                                    <div
-                                                        class="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-                                                        <i class="fas fa-user text-white text-sm"></i>
-                                                    </div>
-                                                    <div>
-                                                        <div class="font-medium text-dark">Budi Santoso</div>
-                                                        <div class="text-sm text-gray-600">budi@email.com</div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td class="py-3 px-4">
-                                                <span
-                                                    class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Aktif</span>
-                                            </td>
-                                            <td class="py-3 px-4 text-sm text-gray-600">22 Okt 2023</td>
-                                            <td class="py-3 px-4">
-                                                <div class="text-sm text-gray-600">5 konsultasi</div>
-                                            </td>
-                                            <td class="py-3 px-4">
-                                                <div class="flex space-x-2">
-                                                    <button class="text-primary hover:text-secondary">
-                                                        <i class="fas fa-edit"></i>
-                                                    </button>
-                                                    <button class="text-red-500 hover:text-red-700">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
+                                                </td>
+                                            </tr>
+                                        @endforeach
                                     </tbody>
+
                                 </table>
+                                <div class="mt-4">
+                                    {{ $users->links() }}
+                                </div>
                             </div>
                         </div>
 
                         <!-- Manajemen Konten Tab -->
                         <div id="content-tab" class="content-section hidden p-6">
+
+                            <!-- HEADER + FILTER -->
                             <div class="flex justify-between items-center mb-6">
-                                <h3 class="text-lg font-semibold text-dark">Manajemen Konten</h3>
+                                <h3 class="text-lg font-semibold text-dark">Manajemen Artikel</h3>
+
                                 <div class="flex space-x-3">
-                                    <select
-                                        class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
-                                        <option>Semua Kategori</option>
-                                        <option>Artikel</option>
-                                        <option>Video</option>
-                                        <option>Tips</option>
-                                    </select>
-                                    <button
-                                        class="px-4 py-2 bg-primary text-white rounded-lg font-semibold hover:bg-secondary transition">
-                                        <i class="fas fa-plus mr-2"></i>Tambah Konten
-                                    </button>
+                                    <form method="GET">
+                                        <input type="hidden" name="tab" value="content">
+                                        <select name="category" id="categorySelect" onchange="this.form.submit()"
+                                            class="w-full md:w-auto px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary transition bg-white">
+
+                                            <option value="">Semua Kategori</option>
+
+                                            <option value="Nutrition"
+                                                {{ request('category') == 'Nutrition' ? 'selected' : '' }}>
+                                                Nutrition
+                                            </option>
+
+                                            <option value="Exercise"
+                                                {{ request('category') == 'Exercise' ? 'selected' : '' }}>
+                                                Exercise
+                                            </option>
+
+                                            <option value="Mental Health"
+                                                {{ request('category') == 'Mental Health' ? 'selected' : '' }}>
+                                                Mental Health
+                                            </option>
+
+                                            <option value="Tips Sehat"
+                                                {{ request('category') == 'Tips Sehat' ? 'selected' : '' }}>
+                                                Tips Sehat
+                                            </option>
+
+                                            <option value="Obesitas"
+                                                {{ request('category') == 'Obesitas' ? 'selected' : '' }}>
+                                                Obesitas
+                                            </option>
+                                        </select>
+                                    </form>
                                 </div>
                             </div>
 
+                            <!-- LIST ARTIKEL DINAMIS -->
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div
-                                    class="admin-card border border-gray-200 rounded-lg p-4 hover:border-primary transition">
-                                    <div class="flex justify-between items-start mb-3">
-                                        <span
-                                            class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">Artikel</span>
-                                        <div class="flex space-x-2">
-                                            <button class="text-primary hover:text-secondary">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button class="text-red-500 hover:text-red-700">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
+                                @forelse ($articles as $article)
+                                    <a href="/articles/{{ $article->id }}"
+                                        class="admin-card border border-gray-200 rounded-lg p-4 hover:border-primary transition block">
+                                        <div class="flex justify-between items-start mb-3">
+                                            <span
+                                                class="px-2 py-1 text-xs rounded
+                    @if ($article->category == 'Artikel') bg-blue-100 text-blue-800
+                    @elseif($article->category == 'Video') bg-green-100 text-green-800
+                    @else bg-purple-100 text-purple-800 @endif">
+                                                {{ $article->category }}
+                                            </span>
                                         </div>
-                                    </div>
-                                    <h4 class="font-semibold text-dark mb-2">10 Pola Makan Sehat untuk Keluarga</h4>
-                                    <p class="text-sm text-gray-600 mb-3">Panduan lengkap pola makan sehat untuk
-                                        seluruh keluarga...</p>
-                                    <div class="flex justify-between items-center text-sm text-gray-500">
-                                        <span>Dibuat: 15 Okt 2023</span>
-                                        <span>1.2k dilihat</span>
-                                    </div>
-                                </div>
 
-                                <div
-                                    class="admin-card border border-gray-200 rounded-lg p-4 hover:border-primary transition">
-                                    <div class="flex justify-between items-start mb-3">
-                                        <span
-                                            class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded">Video</span>
-                                        <div class="flex space-x-2">
-                                            <button class="text-primary hover:text-secondary">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button class="text-red-500 hover:text-red-700">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <h4 class="font-semibold text-dark mb-2">Olahraga Kardio untuk Pemula</h4>
-                                    <p class="text-sm text-gray-600 mb-3">Video panduan olahraga kardio yang aman untuk
-                                        pemula...</p>
-                                    <div class="flex justify-between items-center text-sm text-gray-500">
-                                        <span>Dibuat: 18 Okt 2023</span>
-                                        <span>856 dilihat</span>
-                                    </div>
-                                </div>
+                                        <h4 class="font-semibold text-dark mb-2">
+                                            {{ $article->title }}
+                                        </h4>
 
-                                <div
-                                    class="admin-card border border-gray-200 rounded-lg p-4 hover:border-primary transition">
-                                    <div class="flex justify-between items-start mb-3">
-                                        <span
-                                            class="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded">Tips</span>
-                                        <div class="flex space-x-2">
-                                            <button class="text-primary hover:text-secondary">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button class="text-red-500 hover:text-red-700">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <h4 class="font-semibold text-dark mb-2">Tips Menjaga Berat Badan Ideal</h4>
-                                    <p class="text-sm text-gray-600 mb-3">Cara praktis menjaga berat badan ideal dalam
-                                        kehidupan sehari-hari...</p>
-                                    <div class="flex justify-between items-center text-sm text-gray-500">
-                                        <span>Dibuat: 20 Okt 2023</span>
-                                        <span>943 dilihat</span>
-                                    </div>
-                                </div>
-
-                                <div
-                                    class="admin-card border border-gray-200 rounded-lg p-4 hover:border-primary transition">
-                                    <div class="flex justify-between items-start mb-3">
-                                        <span
-                                            class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">Artikel</span>
-                                        <div class="flex space-x-2">
-                                            <button class="text-primary hover:text-secondary">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button class="text-red-500 hover:text-red-700">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <h4 class="font-semibold text-dark mb-2">Memahami Indeks Massa Tubuh (BMI)</h4>
-                                    <p class="text-sm text-gray-600 mb-3">Penjelasan lengkap tentang BMI dan cara
-                                        menghitungnya...</p>
-                                    <div class="flex justify-between items-center text-sm text-gray-500">
-                                        <span>Dibuat: 22 Okt 2023</span>
-                                        <span>1.5k dilihat</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Analitik Tab -->
-                        <div id="analytics-tab" class="content-section hidden p-6">
-                            <div class="flex justify-between items-center mb-6">
-                                <h3 class="text-lg font-semibold text-dark">Analitik Platform</h3>
-                                <select
-                                    class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
-                                    <option>Bulan Ini</option>
-                                    <option>3 Bulan Terakhir</option>
-                                    <option>Tahun Ini</option>
-                                </select>
-                            </div>
-
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                                <div class="admin-card bg-white border border-gray-200 rounded-lg p-6">
-                                    <h4 class="font-semibold text-dark mb-4">Traffic Pengunjung</h4>
-                                    <div class="h-48 bg-gray-100 rounded-lg flex items-center justify-center">
-                                        <p class="text-gray-500">Grafik traffic pengunjung akan ditampilkan di sini</p>
-                                    </div>
-                                </div>
-
-                                <div class="admin-card bg-white border border-gray-200 rounded-lg p-6">
-                                    <h4 class="font-semibold text-dark mb-4">Distribusi Pengguna</h4>
-                                    <div class="h-48 bg-gray-100 rounded-lg flex items-center justify-center">
-                                        <p class="text-gray-500">Pie chart distribusi pengguna akan ditampilkan di sini
+                                        <p class="text-sm text-gray-600 mb-3 line-clamp-2">
+                                            {{ $article->excerpt }}
                                         </p>
-                                    </div>
-                                </div>
+
+                                        <div class="flex justify-between items-center text-sm text-gray-500">
+                                            <div>
+                                                <span class="font-medium">Oleh: {{ $article->user->first_name }}
+                                                    {{ $article->user->last_name }}</span>
+                                            </div>
+                                            <span>{{ $article->created_at->format('d M Y') }}</span>
+                                        </div>
+                                    </a>
+                                @empty
+                                    <p class="text-gray-500 col-span-2 text-center">Tidak ada artikel.</p>
+                                @endforelse
                             </div>
 
-                            <div class="admin-card bg-white border border-gray-200 rounded-lg p-6">
-                                <h4 class="font-semibold text-dark mb-4">Konten Populer</h4>
-                                <div class="space-y-4">
-                                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                        <div class="flex items-center space-x-3">
-                                            <div
-                                                class="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
-                                                <i class="fas fa-file-alt text-white"></i>
-                                            </div>
-                                            <div>
-                                                <div class="font-medium text-dark">Memahami Indeks Massa Tubuh (BMI)
-                                                </div>
-                                                <div class="text-sm text-gray-600">1,542 views • 85% engagement</div>
-                                            </div>
-                                        </div>
-                                        <div class="text-primary font-bold">95%</div>
-                                    </div>
-
-                                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                        <div class="flex items-center space-x-3">
-                                            <div
-                                                class="w-10 h-10 bg-secondary rounded-full flex items-center justify-center">
-                                                <i class="fas fa-video text-white"></i>
-                                            </div>
-                                            <div>
-                                                <div class="font-medium text-dark">Olahraga Kardio untuk Pemula</div>
-                                                <div class="text-sm text-gray-600">1,210 views • 78% engagement</div>
-                                            </div>
-                                        </div>
-                                        <div class="text-secondary font-bold">88%</div>
-                                    </div>
-
-                                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                        <div class="flex items-center space-x-3">
-                                            <div
-                                                class="w-10 h-10 bg-accent rounded-full flex items-center justify-center">
-                                                <i class="fas fa-file-alt text-white"></i>
-                                            </div>
-                                            <div>
-                                                <div class="font-medium text-dark">10 Pola Makan Sehat untuk Keluarga
-                                                </div>
-                                                <div class="text-sm text-gray-600">987 views • 72% engagement</div>
-                                            </div>
-                                        </div>
-                                        <div class="text-accent font-bold">82%</div>
-                                    </div>
-                                </div>
+                            <!-- PAGINATION -->
+                            <div class="mt-4">
+                                {{ $articles->links() }}
                             </div>
                         </div>
-                    </div>
 
-                    <!-- System Status -->
-                    <div class="admin-card bg-white rounded-2xl shadow-sm p-6">
-                        <h3 class="text-lg font-bold text-dark mb-4">Status Sistem</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div class="text-center p-4 border border-gray-200 rounded-lg">
-                                <div
-                                    class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                                    <i class="fas fa-server text-green-600"></i>
+                        <div id="video-tab" class="content-section hidden p-6">
+
+                            <!-- HEADER + FILTER -->
+                            <div class="flex justify-between items-center mb-6">
+                                <h3 class="text-lg font-semibold text-dark">Manajemen Video</h3>
+
+                                <div class="flex space-x-3">
+                                    <form method="GET">
+                                        <input type="hidden" name="tab" value="video">
+                                        <select name="category" id="categorySelect" onchange="this.form.submit()"
+                                            class="w-full md:w-auto px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary transition bg-white">
+
+                                            <option value="">Semua Kategori</option>
+                                            <option value="Nutrition"
+                                                {{ request('category') == 'Nutrition' ? 'selected' : '' }}>Nutrition
+                                            </option>
+                                            <option value="Exercise"
+                                                {{ request('category') == 'Exercise' ? 'selected' : '' }}>Exercise
+                                            </option>
+                                            <option value="Mental Health"
+                                                {{ request('category') == 'Mental Health' ? 'selected' : '' }}>Mental
+                                                Health</option>
+                                            <option value="Tips Sehat"
+                                                {{ request('category') == 'Tips Sehat' ? 'selected' : '' }}>Tips Sehat
+                                            </option>
+                                            <option value="Obesitas"
+                                                {{ request('category') == 'Obesitas' ? 'selected' : '' }}>Obesitas
+                                            </option>
+                                        </select>
+                                    </form>
                                 </div>
-                                <div class="font-semibold text-dark">Server</div>
-                                <div class="text-sm text-green-600">Online</div>
                             </div>
 
-                            <div class="text-center p-4 border border-gray-200 rounded-lg">
-                                <div
-                                    class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                                    <i class="fas fa-database text-green-600"></i>
-                                </div>
-                                <div class="font-semibold text-dark">Database</div>
-                                <div class="text-sm text-green-600">Stabil</div>
+                            <!-- LIST VIDEO DINAMIS -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                @forelse ($videos as $video)
+                                    <a href="/videos/{{ $video->id }}"
+                                        class="admin-card border border-gray-200 rounded-lg p-4 hover:border-primary transition block">
+                                        <div class="flex justify-between items-start mb-3">
+                                            <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded">
+                                                {{ $video->category }}
+                                            </span>
+                                        </div>
+
+                                        <h4 class="font-semibold text-dark mb-2">{{ $video->title }}</h4>
+
+                                        <p class="text-sm text-gray-600 mb-3 line-clamp-2">
+                                            {{ $video->excerpt }}
+                                        </p>
+
+                                        <div class="flex justify-between items-center text-sm text-gray-500">
+                                            <div>
+                                                <span class="font-medium">Oleh: {{ $video->creator->first_name }}
+                                                    {{ $video->creator->last_name }}</span>
+                                            </div>
+                                            <span>{{ $video->created_at->format('d M Y') }}</span>
+                                        </div>
+                                    </a>
+                                @empty
+                                    <p class="text-gray-500 col-span-2 text-center">Tidak ada video.</p>
+                                @endforelse
                             </div>
 
-                            <div class="text-center p-4 border border-gray-200 rounded-lg">
-                                <div
-                                    class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                                    <i class="fas fa-shield-alt text-green-600"></i>
-                                </div>
-                                <div class="font-semibold text-dark">Keamanan</div>
-                                <div class="text-sm text-green-600">Aman</div>
+                            <!-- PAGINATION -->
+                            <div class="mt-4">
+                                {{ $videos->links() }}
                             </div>
                         </div>
+
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit User Modal -->
+    <div id="editUserModal"
+        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
+        <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl modal-content">
+            <div class="bg-gradient-to-r from-primary to-secondary text-white p-5 rounded-t-2xl">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-lg font-bold">Edit User</h2>
+                    <button onclick="closeEditModal()"
+                        class="text-white hover:bg-white hover:bg-opacity-20 p-2 rounded-full transition">
+                        <i class="fas fa-times text-lg"></i>
+                    </button>
+                </div>
+            </div>
+
+            <form id="editUserForm" class="p-6 space-y-4">
+                @csrf
+                @method('PUT')
+
+                <input type="hidden" id="edit_user_id" name="id">
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="edit_first_name" class="block text-sm font-medium text-gray-700 mb-1">Nama
+                            Depan</label>
+                        <input type="text" id="edit_first_name" name="first_name"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                        <span class="text-red-500 text-xs error-message" id="first_name_error"></span>
+                    </div>
+                    <div>
+                        <label for="edit_last_name" class="block text-sm font-medium text-gray-700 mb-1">Nama
+                            Belakang</label>
+                        <input type="text" id="edit_last_name" name="last_name"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                        <span class="text-red-500 text-xs error-message" id="last_name_error"></span>
+                    </div>
+                </div>
+
+                <div>
+                    <label for="edit_email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <input type="email" id="edit_email" name="email"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                    <span class="text-red-500 text-xs error-message" id="email_error"></span>
+                </div>
+
+                <div>
+                    <label for="edit_phone" class="block text-sm font-medium text-gray-700 mb-1">Telepon</label>
+                    <input type="text" id="edit_phone" name="phone"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                    <span class="text-red-500 text-xs error-message" id="phone_error"></span>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="edit_role" class="block text-sm font-medium text-gray-700 mb-1">Role</label>
+                        <select id="edit_role" name="role"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                            <option value="user">User</option>
+                            <option value="doctor">Doctor</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                        <span class="text-red-500 text-xs error-message" id="role_error"></span>
+                    </div>
+                    <div>
+                        <label for="edit_is_active"
+                            class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                        <select id="edit_is_active" name="is_active"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                            <option value="1">Aktif</option>
+                            <option value="0">Nonaktif</option>
+                        </select>
+                        <span class="text-red-500 text-xs error-message" id="is_active_error"></span>
+                    </div>
+                </div>
+
+                <div id="doctorFields" class="hidden space-y-4">
+                    <div>
+                        <label for="edit_specialization"
+                            class="block text-sm font-medium text-gray-700 mb-1">Spesialisasi</label>
+                        <input type="text" id="edit_specialization" name="specialization"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                        <span class="text-red-500 text-xs error-message" id="specialization_error"></span>
+                    </div>
+                    <div>
+                        <label for="edit_license_number" class="block text-sm font-medium text-gray-700 mb-1">Nomor
+                            Lisensi</label>
+                        <input type="text" id="edit_license_number" name="license_number"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                        <span class="text-red-500 text-xs error-message" id="license_number_error"></span>
+                    </div>
+                </div>
+
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button type="button" onclick="closeEditModal()"
+                        class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition">
+                        Batal
+                    </button>
+                    <button type="submit"
+                        class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary transition flex items-center">
+                        <i class="fas fa-save mr-2"></i>
+                        Simpan Perubahan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete User Modal -->
+    <div id="deleteUserModal"
+        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
+        <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl modal-content">
+            <div class="bg-gradient-to-r from-red-500 to-red-600 text-white p-5 rounded-t-2xl">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-lg font-bold">Konfirmasi Hapus</h2>
+                    <button onclick="closeDeleteModal()"
+                        class="text-white hover:bg-white hover:bg-opacity-20 p-2 rounded-full transition">
+                        <i class="fas fa-times text-lg"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="p-6">
+                <div class="flex items-center justify-center mb-4">
+                    <i class="fas fa-exclamation-triangle text-4xl text-red-500 mr-3"></i>
+                    <div>
+                        <h3 class="font-semibold text-dark">Hapus User?</h3>
+                        <p class="text-gray-600 text-sm mt-1">User: <span id="delete_user_name"
+                                class="font-medium"></span></p>
+                    </div>
+                </div>
+
+                <p class="text-red-600 text-sm mb-4 text-center">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    Tindakan ini tidak dapat dibatalkan. Semua data user akan dihapus permanen.
+                </p>
+
+                <div class="flex justify-end space-x-3">
+                    <button type="button" onclick="closeDeleteModal()"
+                        class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition">
+                        Batal
+                    </button>
+                    <button onclick="confirmDelete()"
+                        class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition flex items-center">
+                        <i class="fas fa-trash mr-2"></i>
+                        Ya, Hapus
+                    </button>
                 </div>
             </div>
         </div>
@@ -707,6 +702,170 @@
                     alert(`Aksi: ${action}`);
                 });
             });
+        });
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const activeTab = urlParams.get("tab") || "users";
+
+            document.querySelectorAll(".content-section").forEach(el => el.classList.add("hidden"));
+            document.querySelectorAll(".tab-button").forEach(el => el.classList.remove("active-tab"));
+
+            document.getElementById(activeTab + "-tab").classList.remove("hidden");
+            document.querySelector(`[data-tab="${activeTab}"]`).classList.add("active-tab");
+        });
+
+        let currentUserId = null;
+
+        // Edit Modal Functions
+        function openEditModal(userId) {
+            currentUserId = userId;
+
+            // Reset error messages
+            document.querySelectorAll('.error-message').forEach(el => {
+                el.textContent = '';
+            });
+
+            // Fetch user data
+            fetch(`/admin/users/${userId}/edit`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const user = data.user;
+
+                        // Fill form fields
+                        document.getElementById('edit_user_id').value = user.id;
+                        document.getElementById('edit_first_name').value = user.first_name;
+                        document.getElementById('edit_last_name').value = user.last_name;
+                        document.getElementById('edit_email').value = user.email;
+                        document.getElementById('edit_phone').value = user.phone || '';
+                        document.getElementById('edit_role').value = user.role;
+                        document.getElementById('edit_is_active').value = user.is_active ? '1' : '0';
+                        document.getElementById('edit_specialization').value = user.specialization || '';
+                        document.getElementById('edit_license_number').value = user.license_number || '';
+
+                        // Show/hide doctor fields based on role
+                        toggleDoctorFields(user.role);
+
+                        // Show modal
+                        document.getElementById('editUserModal').classList.remove('hidden');
+                    } else {
+                        alert('Gagal memuat data user');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Terjadi kesalahan saat memuat data user');
+                });
+        }
+
+        function closeEditModal() {
+            document.getElementById('editUserModal').classList.add('hidden');
+            currentUserId = null;
+        }
+
+        function toggleDoctorFields(role) {
+            const doctorFields = document.getElementById('doctorFields');
+            if (role === 'doctor') {
+                doctorFields.classList.remove('hidden');
+            } else {
+                doctorFields.classList.add('hidden');
+            }
+        }
+
+        // Delete Modal Functions
+        function openDeleteModal(userId, userName) {
+            currentUserId = userId;
+            document.getElementById('delete_user_name').textContent = userName;
+            document.getElementById('deleteUserModal').classList.remove('hidden');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteUserModal').classList.add('hidden');
+            currentUserId = null;
+        }
+
+        function confirmDelete() {
+            if (!currentUserId) return;
+
+            fetch(`/admin/users/${currentUserId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        location.reload(); // Reload page to reflect changes
+                    } else {
+                        alert(data.message);
+                    }
+                    closeDeleteModal();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Terjadi kesalahan saat menghapus user');
+                    closeDeleteModal();
+                });
+        }
+
+        // Form Submission
+        document.getElementById('editUserForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            if (!currentUserId) return;
+
+            const formData = new FormData(this);
+
+            fetch(`/admin/users/${currentUserId}`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        closeEditModal();
+                        location.reload(); // Reload page to reflect changes
+                    } else {
+                        // Display validation errors
+                        if (data.errors) {
+                            Object.keys(data.errors).forEach(field => {
+                                const errorElement = document.getElementById(field + '_error');
+                                if (errorElement) {
+                                    errorElement.textContent = data.errors[field][0];
+                                }
+                            });
+                        } else {
+                            alert(data.message);
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Terjadi kesalahan saat mengupdate user');
+                });
+        });
+
+        // Show/hide doctor fields when role changes
+        document.getElementById('edit_role').addEventListener('change', function() {
+            toggleDoctorFields(this.value);
+        });
+
+        // Close modals when clicking outside
+        document.addEventListener('click', function(e) {
+            if (e.target.id === 'editUserModal') {
+                closeEditModal();
+            }
+            if (e.target.id === 'deleteUserModal') {
+                closeDeleteModal();
+            }
         });
     </script>
 </body>

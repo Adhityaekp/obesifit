@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Auth\Events\Registered;
 use App\Models\User;
+use App\Models\Notification;
 
 class AuthController extends Controller
 {
@@ -34,17 +35,26 @@ class AuthController extends Controller
             $user->is_online = true;
             $user->save();
 
-            // Cek jika email sudah diverifikasi
+            // ✅ Cek verifikasi email
             if (!$user->hasVerifiedEmail()) {
-                $user->is_online = false; // set offline karena logout
+
+                // set offline + logout
+                $user->is_online = false;
                 $user->save();
 
                 Auth::logout();
+
                 return back()->withErrors([
                     'email' => 'Email belum diverifikasi. Silakan cek email Anda untuk verifikasi.',
                 ]);
             }
 
+            // ✅ Cek role admin → redirect ke admin dashboard
+            if ($user->role === 'admin') {
+                return redirect()->route('admin.dashboard');
+            }
+
+            // ✅ Selain admin → redirect default
             return redirect()->intended('/dashboard');
         }
 
@@ -75,7 +85,6 @@ class AuthController extends Controller
         return view('auth.register-doctor');
     }
 
-    // Proses register dokter
     public function registerDoctor(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -97,7 +106,8 @@ class AuthController extends Controller
                 ->withInput();
         }
 
-        $user = User::create([
+        // ✅ Create Doctor (status menunggu approval admin)
+        $doctor = User::create([
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
             'email' => $request->email,
@@ -106,12 +116,30 @@ class AuthController extends Controller
             'role' => 'doctor',
             'specialization' => $request->specialization,
             'license_number' => $request->license_number,
-            'is_active' => false, // menunggu konfirmasi admin
+            'is_active' => false,
         ]);
 
-        // Opsional: tidak perlu verifikasi email, tinggal redirect
-        return redirect()->route('login')->with('success', 'Pendaftaran berhasil! Tunggu konfirmasi dari admin.');
+
+        // ✅ ✅ =============== INSERT NOTIFICATION ===============
+        // Cari semua admin
+        $admins = User::where('role', 'admin')->get();
+
+        foreach ($admins as $admin) {
+            Notification::create([
+                'user_id' => $admin->id,
+                'title' => 'Pengajuan Dokter Baru',
+                'message' => 'Dokter ' . $doctor->first_name . ' ' . $doctor->last_name . ' mendaftar dan menunggu persetujuan Anda.',
+                'type' => 'info',
+                'is_read' => false,
+            ]);
+        }
+        // ✅ =====================================================
+
+
+        return redirect()->route('login')
+            ->with('success', 'Pendaftaran berhasil! Tunggu konfirmasi dari admin.');
     }
+
 
     // Tampilkan form register
     public function showRegisterForm()

@@ -51,40 +51,7 @@ class EducationalVideoController extends Controller
 
         $video = EducationalVideo::create($data);
 
-        return response()->json($video, 201);
-    }
-
-    public function edit($id)
-    {
-        $video = EducationalVideo::where('user_id', auth()->id())->findOrFail($id);
-
-        return view('edit-video', compact('video'));
-    }
-
-    public function update(Request $request, $id)
-    {
-        $video = EducationalVideo::where('user_id', auth()->id())->findOrFail($id);
-
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'category' => 'nullable|string|max:255',
-            'excerpt' => 'nullable|string',
-            'video_url' => 'required|string|max:255',
-            'thumbnail' => 'nullable|image|max:2048',
-            'duration' => 'nullable|integer',
-        ]);
-
-        if ($request->hasFile('thumbnail')) {
-            if ($video->thumbnail) {
-                \Storage::delete('public/videos/' . $video->thumbnail);
-            }
-            $validated['thumbnail'] = $request->file('thumbnail')->store('videos', 'public');
-        }
-
-        $video->update($validated);
-
-        return redirect()->route('videos.edit', $video->id)
-            ->with('success', 'Video berhasil diperbarui!');
+        return redirect()->route('articles-videos.create')->with('success', 'Konten Video berhasil dibuat.');
     }
 
     public function filter(Request $request)
@@ -116,21 +83,111 @@ class EducationalVideoController extends Controller
         return response()->json($videos);
     }
 
-    // Hapus video
-    public function destroy($id)
+    public function edit($id)
     {
-        $video = EducationalVideo::where('user_id', auth()->id())->findOrFail($id);
+        try {
+            $video = EducationalVideo::findOrFail($id);
 
-        if ($video->thumbnail) {
-            \Storage::delete('public/' . $video->thumbnail);
+            // Authorization check
+            if (auth()->user()->role !== 'admin' && $video->user_id !== auth()->id()) {
+                abort(403, 'Unauthorized action.');
+            }
+
+            return response()->json([
+                'success' => true,
+                'video' => $video
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Video tidak ditemukan'
+            ], 404);
         }
-
-        $video->delete();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Video berhasil dihapus.'
-        ]);
     }
 
+    public function update(Request $request, $id)
+    {
+        try {
+            $video = EducationalVideo::findOrFail($id);
+
+            // Authorization check
+            if (auth()->user()->role !== 'admin' && $video->user_id !== auth()->id()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized action.'
+                ], 403);
+            }
+
+            $validator = Validator::make($request->all(), [
+                'title' => 'required|string|max:255',
+                'category' => 'nullable|string|max:255',
+                'excerpt' => 'nullable|string',
+                'video_url' => 'required|string|max:255',
+                'thumbnail' => 'nullable|image|max:2048',
+                'duration' => 'nullable|integer',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $data = $validator->validated();
+
+            // Upload thumbnail baru jika ada
+            if ($request->hasFile('thumbnail')) {
+                // Hapus thumbnail lama jika ada
+                if ($video->thumbnail) {
+                    Storage::disk('public')->delete($video->thumbnail);
+                }
+
+                $data['thumbnail'] = $request->file('thumbnail')->store('videos', 'public');
+            }
+
+            $video->update($data);
+
+            return redirect()->route('videos.show', $video->id)
+                ->with('success', 'Video berhasil diupdate');
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal mengupdate video: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function destroy($id)
+    {
+        try {
+            $video = EducationalVideo::findOrFail($id);
+
+            // Authorization check
+            if (auth()->user()->role !== 'admin' && $video->user_id !== auth()->id()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized action.'
+                ], 403);
+            }
+
+            // Hapus thumbnail jika ada
+            if ($video->thumbnail) {
+                Storage::disk('public')->delete($video->thumbnail);
+            }
+
+            $video->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Video berhasil dihapus'
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menghapus video: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

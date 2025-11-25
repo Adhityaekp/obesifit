@@ -7,6 +7,7 @@ use App\Models\Chat;
 use App\Models\ConsultationRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class ChatController extends Controller
 {
@@ -17,9 +18,9 @@ class ChatController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'consultation_id' => 'required|exists:consultation_requests,id',
-            'message' => 'required_without:attachment_path|string',
+            'message' => 'required_without:attachment|string|nullable',
             'type' => 'required|in:text,image,file',
-            'attachment_path' => 'nullable|string',
+            'attachment' => 'nullable|file|mimes:jpg,jpeg,png,gif,pdf,doc,docx,txt|max:10240', // 10MB max
         ]);
 
         if ($validator->fails()) {
@@ -38,23 +39,30 @@ class ChatController extends Controller
             return response()->json(['message' => 'Konsultasi belum disetujui'], 403);
         }
 
+        $attachmentPath = null;
+
+        // Handle file upload
+        if ($request->hasFile('attachment')) {
+            $file = $request->file('attachment');
+            $fileName = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
+            $folder = $request->type === 'image' ? 'chat-images' : 'chat-files';
+
+            $attachmentPath = $file->storeAs($folder, $fileName, 'public');
+        }
+
         // Simpan pesan user
         $chat = Chat::create([
             'consultation_id' => $consultation->id,
             'sender_id' => Auth::id(),
             'message' => $request->message,
             'type' => $request->type,
-            'attachment_path' => $request->attachment_path,
+            'attachment_path' => $attachmentPath,
         ]);
 
-        // ===================================
-        //   AUTO-WELCOME MESSAGE DOKTER
-        // ===================================
+        // Auto-welcome message dokter (jika pesan pertama)
         $totalMessages = Chat::where('consultation_id', $consultation->id)->count();
 
-        // Jika pesan pertama DAN yang mengirim adalah PASIEN
         if ($totalMessages == 1 && Auth::id() == $consultation->patient_id) {
-
             $doctorName = $consultation->doctor->full_name ?? 'Dokter';
 
             Chat::create([

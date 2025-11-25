@@ -54,27 +54,21 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/articles/{article}', [ArticleController::class, 'show'])->name('articles.show');
     Route::get('/articles-videos/create', [ArticleController::class, 'create'])->name('articles-videos.create');
     Route::post('/articles', [ArticleController::class, 'store'])->name('articles.store');
+    Route::get('/articles/{id}/edit', [ArticleController::class, 'edit'])->name('articles.edit');
+    Route::put('/articles/{id}', [ArticleController::class, 'update'])->name('articles.update');
+    Route::delete('/articles/{id}', [ArticleController::class, 'destroy'])->name('articles.destroy');
 
     // Store Video (dari form tab “Kelola Video”)
     Route::post('/videos', [EducationalVideoController::class, 'store'])->name('videos.store');
+    Route::get('/videos/{id}/edit', [EducationalVideoController::class, 'edit'])->name('videos.edit');
+    Route::put('/videos/{id}', [EducationalVideoController::class, 'update'])->name('videos.update');
+    Route::delete('/videos/{id}', [EducationalVideoController::class, 'destroy'])->name('videos.destroy');
 
     // Detail Video
     Route::get('/videos/{video}', [EducationalVideoController::class, 'show'])->name('videos.show');
 
     // Edit Video
-    Route::get('/videos/{id}/edit', [EducationalVideoController::class, 'edit'])->name('videos.edit');
-    Route::put('/videos/{id}', [EducationalVideoController::class, 'update'])->name('videos.update');
     Route::get('/videos/filter', [EducationalVideoController::class, 'filter'])->name('videos.filter');
-
-    // Artikel
-    Route::delete('articles/{id}', [ArticleController::class, 'destroy'])->name('articles.destroy');
-
-    // Route untuk halaman edit artikel
-    Route::get('articles/{id}/edit', [ArticleController::class, 'edit'])->name('articles.edit');
-    Route::put('articles/{id}', [ArticleController::class, 'update'])->name('articles.update');
-
-    // Video
-    Route::delete('videos/{id}', [EducationalVideoController::class, 'destroy'])->name('videos.destroy');
 
     Route::post('/subscribe', [SubscriptionController::class, 'create'])->name('subscribe');
     Route::post('/subscription/update-status', [SubscriptionController::class, 'updateStatus'])->name('subscription.update');
@@ -147,5 +141,14 @@ Route::middleware(['auth'])->group(function () {
 });
 
 Route::get('/admin/dashboard', [AdminController::class, 'index'])
-    ->middleware(['auth', 'admin'])
+    ->middleware('auth')
     ->name('admin.dashboard');
+
+Route::post('/admin/verify-doctor/{id}', [AdminController::class, 'verifyDoctor'])->name('admin.verify-doctor');
+
+Route::delete('/admin/reject-doctor/{id}', [AdminController::class, 'rejectDoctor'])->name('admin.reject-doctor');
+Route::get('/admin/users/{id}/edit', [AdminController::class, 'editUser']);
+Route::put('/admin/users/{id}', [AdminController::class, 'updateUser']);
+Route::delete('/admin/users/{id}', [AdminController::class, 'deleteUser']);
+Route::post('/admin/change-password', [AdminController::class, 'changePassword']);
+Route::get('/admin/users', [AdminController::class, 'users'])->name('admin.users');
