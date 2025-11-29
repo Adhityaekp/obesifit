@@ -10,7 +10,6 @@ use App\Models\UserHealthProfile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
@@ -172,13 +171,11 @@ class UserController extends Controller
 
         if ($request->hasFile('photo')) {
             $file = $request->file('photo');
-
-            // Simpan ke disk public
             $path = $file->store('profile_photos', 'public');
 
             // Hapus foto lama jika ada
-            if (!empty($user->profile_photo) && Storage::disk('public')->exists($user->profile_photo)) {
-                Storage::disk('public')->delete($user->profile_photo);
+            if ($user->profile_photo && \Storage::exists('public/' . $user->profile_photo)) {
+                \Storage::delete('public/' . $user->profile_photo);
             }
 
             $user->profile_photo = $path;
