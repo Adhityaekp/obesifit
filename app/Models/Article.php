@@ -35,10 +35,11 @@ class Article extends Model
     // Akses URL gambar artikel
     public function getImageUrlAttribute()
     {
-        if ($this->featured_image) {
-            return asset('storage/articles/' . $this->featured_image);
+        if (empty($this->featured_image)) {
+            return asset('img/default-article.jpg');
         }
-        return asset('img/default-article.jpg');
+
+        return asset('storage/' . ltrim($this->featured_image, '/'));
     }
 
     // Tambahkan relasi subContents
