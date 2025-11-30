@@ -14,6 +14,7 @@ use App\Http\Controllers\PasswordResetController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', fn() => view('landingpage'))->name('landingpage');
+Route::get('/konsultasi', fn() => view('user.konsultasi'))->name('konsultasi');
 
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
