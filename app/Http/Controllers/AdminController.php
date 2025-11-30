@@ -86,10 +86,10 @@ class AdminController extends Controller
             $doctor = User::where('role', 'doctor')->findOrFail($id);
 
             // Update status dokter
-            $doctor->update([
+            $doctor->forceFill([
                 'is_active' => true,
-                'email_verified_at' => now()
-            ]);
+                'email_verified_at' => now(),
+            ])->save();
 
             // Buat notifikasi untuk dokter
             Notification::create([

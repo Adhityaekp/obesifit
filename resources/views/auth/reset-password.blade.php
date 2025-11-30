@@ -65,14 +65,13 @@
     </header>
 
     <main class="min-h-screen flex items-center justify-center py-12 px-4">
-        <!-- Reset Password Container -->
         <div class="w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden p-8">
             <div class="text-center mb-8">
                 <h1 class="text-3xl font-bold text-dark mb-2">Reset Kata Sandi</h1>
                 <p class="text-gray-600">Masukkan kata sandi baru Anda.</p>
             </div>
 
-            <!-- Menampilkan pesan error -->
+            <!-- Error Messages -->
             @if ($errors->any())
                 <div class="error-message">
                     <ul class="list-disc list-inside">
@@ -89,10 +88,9 @@
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('password.update') }}" class="space-y-6">
+            <form method="POST" action="{{ route('password.update') }}" class="space-y-6" id="resetForm">
                 @csrf
 
-                <!-- Token reset password -->
                 <input type="hidden" name="token" value="{{ $token }}">
 
                 <div>
@@ -116,14 +114,15 @@
                         placeholder="Konfirmasi kata sandi baru" required>
                 </div>
 
-                <button type="submit"
+                <button type="submit" id="submitBtn"
                     class="w-full bg-primary text-white py-3 rounded-lg font-bold hover:bg-secondary transition">
                     Reset Kata Sandi
                 </button>
 
                 <div class="text-center">
                     <p class="text-gray-600">Sudah ingat kata sandi Anda?
-                        <a href="{{ route('login') }}" class="text-primary font-medium hover:text-secondary">Masuk di sini</a>
+                        <a href="{{ route('login') }}" class="text-primary font-medium hover:text-secondary">Masuk di
+                            sini</a>
                     </p>
                 </div>
             </form>
@@ -131,13 +130,52 @@
     </main>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const messages = document.querySelectorAll('.error-message, .success-message');
-            messages.forEach(function (msg) {
-                setTimeout(function () {
-                    msg.style.transition = 'opacity 0.5s ease';
+        document.getElementById('resetForm').addEventListener('submit', function(e) {
+            const password = document.getElementById('password').value;
+            const confirm = document.getElementById('password_confirmation').value;
+
+            // Password regex
+            const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+
+            // Confirm check
+            if (password !== confirm) {
+                e.preventDefault();
+                alert("Konfirmasi kata sandi tidak sesuai!");
+                return;
+            }
+
+            // Strength check
+            if (!regex.test(password)) {
+                e.preventDefault();
+                alert(
+                    "Kata sandi harus minimal 8 karakter dan mengandung:\n" +
+                    "- Huruf besar (A-Z)\n" +
+                    "- Huruf kecil (a-z)\n" +
+                    "- Angka (0-9)\n" +
+                    "- Simbol (!@#$%^&* dll)"
+                );
+                return;
+            }
+
+            // Loading State
+            const btn = document.getElementById('submitBtn');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Memproses...';
+            btn.disabled = true;
+
+            setTimeout(() => {
+                btn.disabled = false;
+                btn.innerHTML = "Reset Kata Sandi";
+            }, 5000);
+        });
+
+        // Auto hide message
+        document.addEventListener('DOMContentLoaded', function() {
+            const msgs = document.querySelectorAll('.error-message, .success-message');
+            msgs.forEach(function(msg) {
+                setTimeout(function() {
+                    msg.style.transition = 'opacity .5s ease';
                     msg.style.opacity = '0';
-                    setTimeout(function () { msg.remove(); }, 500);
+                    setTimeout(() => msg.remove(), 500);
                 }, 5000);
             });
         });

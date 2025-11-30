@@ -63,6 +63,10 @@
             border-radius: 8px;
             margin-bottom: 16px;
         }
+
+        .hidden {
+            display: none;
+        }
     </style>
 </head>
 
@@ -157,6 +161,7 @@
                             {{ session('success') }}
                         </div>
                     @endif
+                    <div id="js-error" class="error-message hidden"></div>
 
                     <!-- User Registration Form -->
                     <form method="POST" action="{{ route('register') }}" class="space-y-4">
@@ -210,7 +215,8 @@
                             <label for="password" class="block text-gray-700 mb-2">Kata Sandi</label>
                             <input type="password" id="password" name="password"
                                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary @error('password') border-red-500 @enderror"
-                                placeholder="Minimal 8 karakter" required minlength="8">
+                                placeholder="Minimal 8 karakter, huruf besar, huruf kecil, angka & simbol" required
+                                minlength="8">
                             @error('password')
                                 <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
                             @enderror
@@ -255,37 +261,56 @@
     </main>
 
     <script>
-        // Menangani form submission dengan feedback yang lebih baik
         document.querySelector('form').addEventListener('submit', function(e) {
+            let hasError = false;
+
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('password_confirmation').value;
             const terms = document.getElementById('terms').checked;
 
+            const errorBox = document.getElementById('js-error');
+            errorBox.classList.add('hidden');
+            errorBox.innerHTML = "";
+
+            // Validasi Terms
             if (!terms) {
                 e.preventDefault();
-                alert('Anda harus menyetujui Syarat & Ketentuan dan Kebijakan Privasi!');
+                errorBox.innerHTML = "Anda harus menyetujui Syarat & Ketentuan dan Kebijakan Privasi.";
+                errorBox.classList.remove('hidden');
                 return;
             }
 
+            // Validasi password sama
             if (password !== confirmPassword) {
                 e.preventDefault();
-                alert('Konfirmasi kata sandi tidak sesuai!');
+                errorBox.innerHTML = "Konfirmasi kata sandi tidak sesuai.";
+                errorBox.classList.remove('hidden');
                 return;
             }
 
-            if (password.length < 8) {
+            // Validasi password kuat
+            const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+
+            if (!passwordRegex.test(password)) {
                 e.preventDefault();
-                alert('Kata sandi harus minimal 8 karakter!');
+                errorBox.innerHTML = `
+            Kata sandi harus minimal 8 karakter dan mengandung:<br>
+            - Huruf besar (A-Z)<br>
+            - Huruf kecil (a-z)<br>
+            - Angka (0-9)<br>
+            - Simbol (!@#$%^&* dll)
+        `;
+                errorBox.classList.remove('hidden');
                 return;
             }
 
-            // Menampilkan loading state
+            // Loading state
             const submitBtn = this.querySelector('button[type="submit"]');
             const originalText = submitBtn.innerHTML;
+
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Memproses...';
             submitBtn.disabled = true;
 
-            // Reset button setelah 5 detik (fallback)
             setTimeout(() => {
                 submitBtn.innerHTML = originalText;
                 submitBtn.disabled = false;

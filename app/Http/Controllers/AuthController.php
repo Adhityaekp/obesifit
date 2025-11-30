@@ -140,7 +140,6 @@ class AuthController extends Controller
             ->with('success', 'Pendaftaran berhasil! Tunggu konfirmasi dari admin.');
     }
 
-
     // Tampilkan form register
     public function showRegisterForm()
     {

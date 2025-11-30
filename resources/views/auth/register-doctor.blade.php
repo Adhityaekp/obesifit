@@ -103,6 +103,7 @@
                         <a href="{{ route('register.doctor') }}"
                             class="flex-1 py-2 rounded-md font-medium text-center tab-active">Dokter/Ahli Gizi</a>
                     </div>
+                    <div id="form-error" class="hidden bg-red-100 text-red-700 p-3 rounded-lg text-sm mt-2"></div>
 
                     <!-- Doctor Registration Form -->
                     <form method="POST" action="{{ route('register.doctor') }}" class="space-y-4">
@@ -194,7 +195,8 @@
                             <label for="password" class="block text-gray-700 mb-2">Kata Sandi</label>
                             <input type="password" name="password" id="password"
                                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary @error('password') border-red-500 @enderror"
-                                placeholder="Minimal 8 karakter" required minlength="8">
+                                placeholder="Minimal 8 karakter, ada huruf besar, kecil, angka & simbol" required
+                                minlength="8">
                             @error('password')
                                 <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
                             @enderror
@@ -239,40 +241,47 @@
     </main>
 
     <script>
-        document.getElementById('register-doctor-form').addEventListener('submit', function(e) {
-            e.preventDefault();
+        document.querySelector('form').addEventListener('submit', function(e) {
 
-            const password = document.getElementById('doctor-password').value;
-            const confirmPassword = document.getElementById('doctor-confirm-password').value;
-            const license = document.getElementById('doctor-license').value;
-            const specialization = document.getElementById('doctor-specialization').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('password_confirmation').value;
+            const license = document.getElementById('license_number').value;
+            const specialization = document.getElementById('specialization').value;
 
-            if (password !== confirmPassword) {
-                alert('Konfirmasi kata sandi tidak sesuai!');
+            const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#]).{8,}$/;
+
+            const errorBox = document.getElementById('form-error');
+            errorBox.classList.add('hidden');
+            errorBox.innerHTML = "";
+
+            function showError(msg) {
+                e.preventDefault();
+                errorBox.innerHTML = msg;
+                errorBox.classList.remove('hidden');
+            }
+
+            if (!passwordRegex.test(password)) {
+                showError("Password harus minimal 8 karakter dan mengandung huruf besar, kecil, angka dan simbol.");
                 return;
             }
 
-            if (password.length < 8) {
-                alert('Kata sandi harus minimal 8 karakter!');
+            if (password !== confirmPassword) {
+                showError("Konfirmasi kata sandi tidak sesuai.");
                 return;
             }
 
             if (!license) {
-                alert('Nomor lisensi harus diisi!');
+                showError("Nomor lisensi harus diisi!");
                 return;
             }
 
             if (!specialization) {
-                alert('Spesialisasi harus dipilih!');
+                showError("Spesialisasi harus dipilih!");
                 return;
             }
-
-            // Add doctor registration logic here
-            alert('Pendaftaran dokter/ahli gizi berhasil!');
-            // Redirect ke halaman login atau dashboard
-            // window.location.href = 'login.html';
         });
     </script>
+
 </body>
 
 </html>
