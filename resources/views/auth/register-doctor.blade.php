@@ -74,7 +74,7 @@
                             <div class="flex items-center">
                                 <div
                                     class="w-8 h-8 bg-white bg-opacity-20 rounded-full flex items-center justify-center mr-3">
-                                    <i class="fas fa-chart-medical text-white"></i>
+                                    <i class="fas fa-heartbeat text-white"></i>
                                 </div>
                                 <span>Pantau progress pasien</span>
                             </div>
@@ -98,8 +98,9 @@
 
                     <!-- Navigation Tabs -->
                     <div class="flex bg-gray-100 rounded-lg p-1 mb-6">
-                        <a href="register-user.html" class="flex-1 py-2 rounded-md font-medium text-center">Pengguna</a>
-                        <a href="register-doctor.html"
+                        <a href="{{ route('register') }}"
+                            class="flex-1 py-2 rounded-md font-medium text-center">Pengguna</a>
+                        <a href="{{ route('register.doctor') }}"
                             class="flex-1 py-2 rounded-md font-medium text-center tab-active">Dokter/Ahli Gizi</a>
                     </div>
 

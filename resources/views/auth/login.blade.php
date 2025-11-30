@@ -96,7 +96,7 @@
                             <div class="flex items-center">
                                 <div
                                     class="w-8 h-8 bg-white bg-opacity-20 rounded-full flex items-center justify-center mr-3">
-                                    <i class="fas fa-article text-white"></i>
+                                    <i class="fas fa-file-alt text-white"></i>
                                 </div>
                                 <span>Akses artikel kesehatan terbaru</span>
                             </div>

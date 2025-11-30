@@ -110,7 +110,7 @@
                             <div class="flex items-center">
                                 <div
                                     class="w-8 h-8 bg-white bg-opacity-20 rounded-full flex items-center justify-center mr-3">
-                                    <i class="fas fa-users text-white"></i>
+                                    <i class="fas fa-user-friends text-white"></i>
                                 </div>
                                 <span>Komunitas yang supportif</span>
                             </div>
