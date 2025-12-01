@@ -820,9 +820,11 @@
 
                 div.innerHTML = `
                 <div class="flex items-start space-x-3 mb-3">
-                    <img src="${doctor.profile_photo || '/img/default-user.jpg'}" 
-                         alt="${doctor.first_name}" 
-                         class="doctor-avatar w-12 h-12 rounded-full object-cover ring-2 ring-gray-100">
+                    <img src="${doctor.profile_photo 
+                            ? '/storage/' + doctor.profile_photo 
+                            : '/img/default-user.jpg'}"
+                    alt="${doctor.first_name}"
+                    class="doctor-avatar w-12 h-12 rounded-full object-cover ring-2 ring-gray-100">
                     <div class="flex-1 min-w-0">
                         <div class="font-semibold text-dark truncate">${doctor.first_name} ${doctor.last_name}</div>
                         <div class="text-sm text-gray-600 truncate">${doctor.specialization || '-'}</div>
@@ -938,7 +940,10 @@
 
             document.getElementById('current-expert-name').textContent = doctor.first_name + ' ' + doctor.last_name;
             document.getElementById('current-expert-specialty').textContent = doctor.specialization || '-';
-            document.getElementById('current-expert-avatar').src = doctor.profile_photo || '/img/default-user.jpg';
+            document.getElementById('current-expert-avatar').src =
+                doctor.profile_photo ?
+                '/storage/' + doctor.profile_photo :
+                '/img/default-user.jpg';
             document.getElementById('current-expert-status').className =
                 'online-dot absolute bottom-0 right-0 border-2 border-white';
 
@@ -1352,7 +1357,7 @@
             suggestedMessages.forEach(msg => {
                 const btn = document.createElement('button');
                 btn.className =
-                'px-3 py-1 bg-primary text-white text-sm rounded-full hover:bg-secondary transition';
+                    'px-3 py-1 bg-primary text-white text-sm rounded-full hover:bg-secondary transition';
                 btn.textContent = msg;
                 btn.addEventListener('click', () => {
                     const input = document.getElementById('message-input');
